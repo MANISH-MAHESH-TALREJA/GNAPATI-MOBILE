@@ -1,4 +1,3 @@
-import 'package:flutter/animation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'card_item.dart';
@@ -119,8 +118,8 @@ class AnimHelper {
   void _initAnimation() {
     _animationController = AnimationController(
         vsync: _tickerProvider!,
-        duration: controller.animDuration ??
-            const Duration(milliseconds: ANIM_DURATION));
+        duration: controller.animDuration == null ?
+            const Duration(milliseconds: ANIM_DURATION) : controller.animDuration);
     _animation = new Tween(begin: 0.0, end: 1.0).animate(_animationController!);
     _animation!.addListener(listenerForSetState);
     _animation!.addStatusListener((status) {

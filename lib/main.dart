@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:ganpati/Constants.dart';
-import 'SplashScreen.dart';
+import 'package:ganpati/constants.dart';
+import 'splash_screen.dart';
 
 void main() async
 {
