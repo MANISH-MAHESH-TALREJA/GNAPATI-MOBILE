@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "431532816074",
+    "project_id": "manish-ganpati-bappa",
+    "storage_bucket": "manish-ganpati-bappa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431532816074:android:aa61ac4fc3ecd4bdb2e633",
+        "android_client_info": {
+          "package_name": "net.manish.ganpati"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "431532816074-mi41bulv3rnv9s4v6n613b2rn3rt4agr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.manish.ganpati",
+            "certificate_hash": "1353ea31529f91bda9f805c039c7e87128a604bc"
+          }
+        },
+        {
+          "client_id": "431532816074-j60hv57jnj7dmdiog6oh1n60tj5fcr29.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9h4v9OTF-MThTsrTcpgjkFCgkJgx6vdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "431532816074-j60hv57jnj7dmdiog6oh1n60tj5fcr29.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
