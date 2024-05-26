@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:audioplayer/audioplayer.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -9,6 +8,7 @@ import 'package:http/http.dart';
 import 'package:ganpati/Models/RingtonesModel.dart';
 import 'package:ganpati/SecondTabPages/ChildPages/RingtonesOutput.dart';
 import '../../Constants.dart';
+import '../../audio_player.dart';
 
 // ignore: must_be_immutable
 class RingtoneFiles extends StatefulWidget
@@ -31,37 +31,37 @@ class _RingtoneFilesState extends State<RingtoneFiles>
     super.initState();
     initAudioPlayer();
   }
-  Duration duration;
-  Duration position;
-  AudioPlayer audioPlayer;
-  String localFilePath;
+  Duration? duration;
+  Duration? position;
+  AudioPlayer? audioPlayer;
+  String? localFilePath;
   PlayerState playerState = PlayerState.stopped;
   get isPlaying => playerState == PlayerState.playing;
   get isPaused => playerState == PlayerState.paused;
   get durationText => duration != null ? duration.toString().split('.').first : '';
   get positionText => position != null ? position.toString().split('.').first : '';
-  StreamSubscription _positionSubscription;
-  StreamSubscription _audioPlayerStateSubscription;
+  StreamSubscription? _positionSubscription;
+  StreamSubscription? _audioPlayerStateSubscription;
 
   @override
   void dispose()
   {
-    _positionSubscription.cancel();
-    _audioPlayerStateSubscription.cancel();
-    audioPlayer.stop();
+    _positionSubscription!.cancel();
+    _audioPlayerStateSubscription!.cancel();
+    audioPlayer!.stop();
     super.dispose();
   }
 
   void initAudioPlayer()
   {
     audioPlayer = AudioPlayer();
-    _positionSubscription = audioPlayer.onAudioPositionChanged.listen((p) => setState(() => position = p));
+    _positionSubscription = audioPlayer!.onAudioPositionChanged.listen((p) => setState(() => position = p));
     _audioPlayerStateSubscription =
-        audioPlayer.onPlayerStateChanged.listen((s)
+        audioPlayer!.onPlayerStateChanged.listen((s)
         {
           if (s == AudioPlayerState.PLAYING)
           {
-            setState(() => duration = audioPlayer.duration);
+            setState(() => duration = audioPlayer!.duration);
           }
           else if (s == AudioPlayerState.STOPPED)
           {
@@ -84,7 +84,7 @@ class _RingtoneFilesState extends State<RingtoneFiles>
 
   Future play(String ringUrl) async
   {
-    await audioPlayer.play(ringUrl);
+    await audioPlayer!.play(ringUrl);
     setState(()
     {
       playerState = PlayerState.playing;
@@ -93,7 +93,7 @@ class _RingtoneFilesState extends State<RingtoneFiles>
 
   Future stop() async
   {
-    await audioPlayer.stop();
+    await audioPlayer!.stop();
     setState(()
     {
       playerState = PlayerState.stopped;
@@ -137,7 +137,7 @@ class _RingtoneFilesState extends State<RingtoneFiles>
     );
   }
 
-  List<RingtonesModel> categories;
+  List<RingtonesModel>? categories;
   Future<List<RingtonesModel>> getProductList(String page) async
   {
     Response response;
@@ -148,7 +148,7 @@ class _RingtoneFilesState extends State<RingtoneFiles>
     if (statusCode == 200)
     {
       categories = (body as List).map((i) => RingtonesModel.fromJson(i)).toList();
-      return categories;
+      return categories!;
     }
     else
     {
@@ -160,7 +160,7 @@ class _RingtoneFilesState extends State<RingtoneFiles>
   Widget TirangaCard(int index, RingtonesModel value, Orientation orientation)
   {
     return GestureDetector(
-      onTap: () => showMaterialModalBottomSheet(context: context, builder: (context) => AudioApp(value.audioLink, value.audioName)),
+      onTap: () => showMaterialModalBottomSheet(context: context, builder: (context) => AudioApp(value.audioLink!, value.audioName!)),
       child: Padding(
         padding: const EdgeInsets.all(5.0),
         child: Card(
@@ -193,7 +193,7 @@ class _RingtoneFilesState extends State<RingtoneFiles>
                           textDirection : TextDirection.ltr,
                           animationDuration: Duration(seconds: 3),
                           directionMarguee: DirectionMarguee.oneDirection,
-                          child: Text(value.audioName.toUpperCase(), maxLines: 2, //textAlign: TextAlign.center,
+                          child: Text(value.audioName!.toUpperCase(), maxLines: 2, //textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 20,color: (index+1)%2==0?Constants.BlueColor:Colors.white, fontFamily: Constants.AppFont, fontWeight: FontWeight.bold)))),
                     ),
                   ])

@@ -19,7 +19,7 @@ class HorizontalMainPage extends StatefulWidget
 
 class _HorizontalMainPageState extends State<HorizontalMainPage>
 {
-  DateTime currentBackPressTime;
+  DateTime? currentBackPressTime;
   @override
   void initState()
   {
@@ -143,7 +143,7 @@ class _HorizontalMainPageState extends State<HorizontalMainPage>
   Future<bool> onWillPop()
   {
     DateTime now = DateTime.now();
-    if (currentBackPressTime == null || now.difference(currentBackPressTime) > Duration(seconds: 2))
+    if (currentBackPressTime == null || now.difference(currentBackPressTime!) > Duration(seconds: 2))
     {
       currentBackPressTime = now;
       showToast(context,"PRESS BACK BUTTON AGAIN TO EXIT");

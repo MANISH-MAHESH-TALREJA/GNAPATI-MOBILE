@@ -1,29 +1,30 @@
-import 'package:androidversion/androidversion.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:toast/toast.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wallpaper_manager/wallpaper_manager.dart';
 import 'package:wc_flutter_share/wc_flutter_share.dart';
 import 'Constants.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
+import 'android_version.dart';
+
 void showToast(BuildContext context, String message)
 {
-  Toast.show(message, context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM, backgroundColor: Constants.OrangeColor, textColor: Constants.GreenColor);
+  Toast.show(message, duration: Toast.lengthLong, gravity: Toast.bottom, backgroundColor: Constants.OrangeColor, textStyle: TextStyle(color: Constants.GreenColor));
 }
 
 Future<String> _findLocalPath() async
 {
   var directory = await getExternalStorageDirectory();
-  return directory.path;
+  return directory!.path;
 }
 
 Future<void> downloadMedia(BuildContext context, String url, String mediaFolder, String defaultFolder) async
@@ -171,9 +172,9 @@ void mediaShare(BuildContext context, String url, String media, String mediaType
 
 void launchLink(String link)
 {
-  if (canLaunch(link) != null)
+  if (canLaunchUrl(Uri.parse(link)) != null)
   {
-    launch(link);
+    launchUrl(Uri.parse(link));
   }
   else
   {
@@ -249,7 +250,7 @@ void shareMe()
 
 Future<Map<dynamic, dynamic>> initPlatformState() async
 {
-  Map<dynamic, dynamic> info;
+  Map<dynamic, dynamic>? info;
   try
   {
     info = await AndroidInfo.version;
@@ -258,7 +259,7 @@ Future<Map<dynamic, dynamic>> initPlatformState() async
   {
     info = {'error': 'Failed to get platform version.'};
   }
-  return info;
+  return info!;
 }
 
 Future<bool> check() async

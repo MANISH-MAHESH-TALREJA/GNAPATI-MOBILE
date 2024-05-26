@@ -1,9 +1,12 @@
 import 'dart:math' as math;
 import 'package:animated_background/animated_background.dart';
 import 'package:flutter/material.dart';
-import 'package:infinite_cards/infinite_cards.dart';
 import 'package:ganpati/Constants.dart';
 import 'package:ganpati/MainPages/Other/AppBarDrawer.dart';
+
+import '../../infinite_cards/src/anim_transform.dart';
+import '../../infinite_cards/src/infinite_card_view.dart';
+import '../../infinite_cards/src/infinite_cards_controller.dart';
 
 class ThirdPage extends StatefulWidget
 {
@@ -13,7 +16,7 @@ class ThirdPage extends StatefulWidget
 
 class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
 {
-  InfiniteCardsController _controller;
+  InfiniteCardsController? _controller;
   bool _isTypeSwitch = true;
 
   @override
@@ -44,12 +47,12 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
   {
     if (_isTypeSwitch)
     {
-      _controller.reset(itemCount: 5, animType: AnimType.TO_FRONT, transformToBack: _customToBackTransform,
+      _controller!.reset(itemCount: 5, animType: AnimType.TO_FRONT, transformToBack: _customToBackTransform,
       );
     }
     else
     {
-      _controller.reset(itemCount: 5, animType: AnimType.SWITCH, transformToBack: DefaultToBackTransform,);
+      _controller!.reset(itemCount: 5, animType: AnimType.SWITCH, transformToBack: DefaultToBackTransform,);
     }
     _isTypeSwitch = !_isTypeSwitch;
   }
@@ -106,9 +109,9 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
                           ),
                         ),
                         style: ButtonStyle(
-                            foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor: MaterialStateProperty.all<Color>(Constants.OrangeColor),
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                            backgroundColor: WidgetStateProperty.all<Color>(Constants.OrangeColor),
+                            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.00),
                                     side: BorderSide(color: Constants.GreenColor)
@@ -117,8 +120,8 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
                         ),
                         onPressed: ()
                         {
-                          _controller.reset(animType: _isTypeSwitch ? AnimType.SWITCH : AnimType.TO_FRONT);
-                          _controller.previous();
+                          _controller!.reset(animType: _isTypeSwitch ? AnimType.SWITCH : AnimType.TO_FRONT);
+                          _controller!.previous();
                         }
                     ),
                     ElevatedButton(
@@ -137,9 +140,9 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
                           ),
                         ),
                         style: ButtonStyle(
-                            foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor: MaterialStateProperty.all<Color>(Constants.OrangeColor),
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                            backgroundColor: WidgetStateProperty.all<Color>(Constants.OrangeColor),
+                            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.00),
                                     side: BorderSide(color: Constants.GreenColor)
@@ -164,9 +167,9 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
                           ),
                         ),
                         style: ButtonStyle(
-                            foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor: MaterialStateProperty.all<Color>(Constants.OrangeColor),
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                            backgroundColor: WidgetStateProperty.all<Color>(Constants.OrangeColor),
+                            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.00),
                                     side: BorderSide(color: Constants.GreenColor)
@@ -175,8 +178,8 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
                         ),
                         onPressed: ()
                         {
-                          _controller.reset(animType: AnimType.TO_END);
-                          _controller.next();
+                          _controller!.reset(animType: AnimType.TO_END);
+                          _controller!.next();
                         }
                     ),
                   ],
@@ -233,9 +236,9 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
                             ),
                           ),
                           style: ButtonStyle(
-                              foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                              backgroundColor: MaterialStateProperty.all<Color>(Constants.OrangeColor),
-                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                              backgroundColor: WidgetStateProperty.all<Color>(Constants.OrangeColor),
+                              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10.00),
                                       side: BorderSide(color: Constants.GreenColor)
@@ -244,8 +247,8 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
                           ),
                           onPressed: ()
                           {
-                            _controller.reset(animType: _isTypeSwitch ? AnimType.SWITCH : AnimType.TO_FRONT);
-                            _controller.previous();
+                            _controller!.reset(animType: _isTypeSwitch ? AnimType.SWITCH : AnimType.TO_FRONT);
+                            _controller!.previous();
                           }
                       ),
                       ElevatedButton(
@@ -263,9 +266,9 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
                             ),
                           ),
                           style: ButtonStyle(
-                              foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                              backgroundColor: MaterialStateProperty.all<Color>(Constants.OrangeColor),
-                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                              backgroundColor: WidgetStateProperty.all<Color>(Constants.OrangeColor),
+                              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10.00),
                                       side: BorderSide(color: Constants.GreenColor)
@@ -289,9 +292,9 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
                             ),
                           ),
                           style: ButtonStyle(
-                              foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                              backgroundColor: MaterialStateProperty.all<Color>(Constants.OrangeColor),
-                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                              backgroundColor: WidgetStateProperty.all<Color>(Constants.OrangeColor),
+                              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10.00),
                                       side: BorderSide(color: Constants.GreenColor)
@@ -300,8 +303,8 @@ class _ThirdPageState extends State<ThirdPage> with TickerProviderStateMixin
                           ),
                           onPressed: ()
                           {
-                            _controller.reset(animType: AnimType.TO_END);
-                            _controller.next();
+                            _controller!.reset(animType: AnimType.TO_END);
+                            _controller!.next();
                           }
                       ),
                     ],
@@ -355,17 +358,17 @@ class RainParticleBehaviour extends RandomParticleBehaviour
   bool enabled;
   RainParticleBehaviour({
     ParticleOptions options = const ParticleOptions(),
-    Paint paint,
+    Paint? paint,
     this.enabled = true}) : assert(options != null), super(options: options, paint: paint);
 
   @override
   void initPosition(Particle p)
   {
-    p.cx = random.nextDouble() * size.width;
+    p.cx = random.nextDouble() * size!.width;
     if (p.cy == 0.0)
-      p.cy = random.nextDouble() * size.height;
+      p.cy = random.nextDouble() * size!.height;
     else
-      p.cy = random.nextDouble() * size.width * 0.2;
+      p.cy = random.nextDouble() * size!.width * 0.2;
   }
 
   @override
@@ -396,7 +399,7 @@ class RainParticleBehaviour extends RandomParticleBehaviour
   {
     RenderBox renderBox = context.findRenderObject() as RenderBox;
     var offset = renderBox.globalToLocal(offsetGlobal);
-    particles.forEach((particle)
+    particles!.forEach((particle)
     {
       var delta = (Offset(particle.cx, particle.cy) - offset);
       if (delta.distanceSquared < 70 * 70)

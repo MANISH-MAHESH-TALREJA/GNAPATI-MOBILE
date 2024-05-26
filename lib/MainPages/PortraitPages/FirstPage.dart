@@ -1,6 +1,5 @@
+import 'package:another_carousel_pro/another_carousel_pro.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_pro/carousel_pro.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ganpati/Constants.dart';
 import 'package:ganpati/FirstTabPages/ParentPages/ImageFiles.dart';
@@ -24,7 +23,7 @@ class FirstPage extends StatelessWidget
           child: SizedBox(
               height: MediaQuery.of(context).size.height/4.35,
               width: MediaQuery.of(context).size.width - 25,
-              child: Carousel(
+              child: AnotherCarousel(
                 images:
                 [
                   CachedNetworkImageProvider(Constants.BannerNetworkImage_01),

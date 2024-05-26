@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'package:audioplayer/audioplayer.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:ganpati/GeneralUtilityFunctions.dart';
 import '../../Constants.dart';
+import 'audio_player.dart';
 
 typedef void OnError(Exception exception);
 
@@ -29,37 +29,37 @@ class _PujaOutputState extends State<PujaOutput>
     initPlatformState();
   }
 
-  Duration duration;
-  Duration position;
-  AudioPlayer audioPlayer;
-  String localFilePath;
+  Duration? duration;
+  Duration? position;
+  AudioPlayer? audioPlayer;
+  String? localFilePath;
   PlayerState playerState = PlayerState.stopped;
   get isPlaying => playerState == PlayerState.playing;
   get isPaused => playerState == PlayerState.paused;
   get durationText => duration != null ? duration.toString().split('.').first.replaceFirst("0:", "") : '';
   get positionText => position != null ? position.toString().split('.').first.replaceFirst("0:", "") : '';
-  StreamSubscription _positionSubscription;
-  StreamSubscription _audioPlayerStateSubscription;
+  StreamSubscription? _positionSubscription;
+  StreamSubscription? _audioPlayerStateSubscription;
 
   @override
   void dispose()
   {
-    _positionSubscription.cancel();
-    _audioPlayerStateSubscription.cancel();
-    audioPlayer.stop();
+    _positionSubscription!.cancel();
+    _audioPlayerStateSubscription!.cancel();
+    audioPlayer!.stop();
     super.dispose();
   }
 
   void initAudioPlayer()
   {
     audioPlayer = AudioPlayer();
-    _positionSubscription = audioPlayer.onAudioPositionChanged.listen((p) => setState(() => position = p));
+    _positionSubscription = audioPlayer!.onAudioPositionChanged.listen((p) => setState(() => position = p));
     _audioPlayerStateSubscription =
-        audioPlayer.onPlayerStateChanged.listen((s)
+        audioPlayer!.onPlayerStateChanged.listen((s)
         {
           if (s == AudioPlayerState.PLAYING)
           {
-            setState(() => duration = audioPlayer.duration);
+            setState(() => duration = audioPlayer!.duration);
           }
           else if (s == AudioPlayerState.STOPPED)
           {
@@ -82,7 +82,7 @@ class _PujaOutputState extends State<PujaOutput>
 
   Future play(String ringUrl) async
   {
-    await audioPlayer.play(ringUrl);
+    await audioPlayer!.play(ringUrl);
     setState(()
     {
       playerState = PlayerState.playing;
@@ -91,7 +91,7 @@ class _PujaOutputState extends State<PujaOutput>
 
   Future pause() async
   {
-    await audioPlayer.pause();
+    await audioPlayer!.pause();
     setState(()
     {
       playerState = PlayerState.paused;
@@ -100,7 +100,7 @@ class _PujaOutputState extends State<PujaOutput>
 
   Future stop() async
   {
-    await audioPlayer.stop();
+    await audioPlayer!.stop();
     setState(()
     {
       playerState = PlayerState.stopped;
@@ -132,10 +132,10 @@ class _PujaOutputState extends State<PujaOutput>
               front: Padding(
                 padding: const EdgeInsets.symmetric(vertical : 5.0),
                 child: Center(child: SingleChildScrollView(child: Html(
-                    defaultTextStyle: TextStyle(
+                    /*defaultTextStyle: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white),
+                        color: Colors.white),*/
                     data: '''  ${"<center>"+widget.hindi+"</center>"}   '''),
                 )),
               ),
@@ -147,10 +147,10 @@ class _PujaOutputState extends State<PujaOutput>
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical : 5.0),
                   child: Center(child: SingleChildScrollView(child: Html(
-                      defaultTextStyle: TextStyle(
+                      /*defaultTextStyle: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white),
+                          color: Colors.white),*/
                       data: '''  ${"<center>"+widget.english+"</center>"}   '''),
                   )),
                 ),
@@ -201,7 +201,7 @@ class _PujaOutputState extends State<PujaOutput>
                         Padding(
                           padding: EdgeInsets.only(right:5.0, left : 5),
                           child: CircularProgressIndicator(
-                            value: position != null && position.inMilliseconds > 0 ? (position?.inMilliseconds?.toDouble() ?? 0.0) / (duration?.inMilliseconds?.toDouble() ?? 0.0) : 0.0,
+                            value: position != null && position!.inMilliseconds > 0 ? (position?.inMilliseconds.toDouble() ?? 0.0) / (duration?.inMilliseconds?.toDouble() ?? 0.0) : 0.0,
                             valueColor: AlwaysStoppedAnimation(Constants.BlueColor),
                             backgroundColor: Colors.grey[500],
                           ),

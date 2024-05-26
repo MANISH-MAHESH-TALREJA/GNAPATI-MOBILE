@@ -1,5 +1,5 @@
 class MantraModel {
-  String mantraName;
+  String? mantraName;
 
   MantraModel({this.mantraName});
 

@@ -54,7 +54,7 @@ class _MantraListState extends State<MantraList>
     );
   }
 
-  List<MantraModel> categories;
+  List<MantraModel>? categories;
   Future<List<MantraModel>> getProductList(String page) async
   {
     Response response;
@@ -65,7 +65,7 @@ class _MantraListState extends State<MantraList>
     if (statusCode == 200)
     {
       categories = (body as List).map((i) => MantraModel.fromJson(i)).toList();
-      return categories;
+      return categories!;
     }
     else
     {
@@ -107,7 +107,7 @@ class _MantraListState extends State<MantraList>
                         textDirection : TextDirection.ltr,
                         animationDuration: Duration(seconds: 3),
                         directionMarguee: DirectionMarguee.oneDirection,
-                        child: Text(value.mantraName.toUpperCase(), maxLines: 2, //textAlign: TextAlign.center,
+                        child: Text(value.mantraName!.toUpperCase(), maxLines: 2, //textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 20,color: (index+1)%2==0?Constants.BlueColor:Colors.white, fontFamily: Constants.AppFont, fontWeight: FontWeight.bold)))),
                   ),
                 ])
