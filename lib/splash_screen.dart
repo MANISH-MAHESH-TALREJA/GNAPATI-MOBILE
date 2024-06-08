@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:toast/toast.dart';
 import 'constants.dart';
 import 'main_pages/Other/start_page.dart';
 
@@ -20,8 +23,22 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
     return new Timer(_duration, navigationPage);
   }
 
-  void navigationPage()
+  void navigationPage() async
   {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    if(androidInfo.version.sdkInt >= 33.0)
+    {
+      PermissionStatus permissionStatus = await Permission.notification.status;
+      if(permissionStatus.isGranted)
+      {
+        debugPrint("PERMISSION GRANTED");
+      }
+      else
+      {
+        await Permission.notification.request();
+      }
+    }
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
   }
 
@@ -45,6 +62,7 @@ class SplashScreenState extends State<SplashScreen> with SingleTickerProviderSta
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return Scaffold(
       backgroundColor: Constants.OrangeColor,
       body: Center(

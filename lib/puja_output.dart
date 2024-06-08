@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'package:audio_player/audioplayer.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:ganpati/general_utility_functions.dart';
+import 'package:toast/toast.dart';
 import '../../constants.dart';
-import 'audio_player.dart';
+import 'flutter_html/flutter_html.dart';
 
 typedef void OnError(Exception exception);
 
@@ -25,7 +26,6 @@ class _PujaOutputState extends State<PujaOutput>
   {
     super.initState();
     initAudioPlayer();
-    initPlatformState();
   }
 
   Duration? duration;
@@ -56,11 +56,11 @@ class _PujaOutputState extends State<PujaOutput>
     _audioPlayerStateSubscription =
         audioPlayer!.onPlayerStateChanged.listen((s)
         {
-          if (s == AudioPlayerState.PLAYING)
+          if (s == AudioPlayerState.playing)
           {
             setState(() => duration = audioPlayer!.duration);
           }
-          else if (s == AudioPlayerState.STOPPED)
+          else if (s == AudioPlayerState.stopped)
           {
             onComplete();
             setState(()
@@ -115,9 +115,10 @@ class _PujaOutputState extends State<PujaOutput>
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return Scaffold(
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal:5.0),
+          padding: const EdgeInsets.only(top:5.0, left: 5.0, right: 5.0),
           child: Container(
             decoration: BoxDecoration(
                 color: Color(0xFFFFA500),
@@ -131,10 +132,10 @@ class _PujaOutputState extends State<PujaOutput>
               front: Padding(
                 padding: const EdgeInsets.symmetric(vertical : 5.0),
                 child: Center(child: SingleChildScrollView(child: Html(
-                    /*defaultTextStyle: TextStyle(
+                    defaultTextStyle: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white),*/
+                        color: Colors.white),
                     data: '''  ${"<center>"+widget.hindi+"</center>"}   '''),
                 )),
               ),
@@ -146,10 +147,10 @@ class _PujaOutputState extends State<PujaOutput>
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical : 5.0),
                   child: Center(child: SingleChildScrollView(child: Html(
-                      /*defaultTextStyle: TextStyle(
+                      defaultTextStyle: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white),*/
+                          color: Colors.white),
                       data: '''  ${"<center>"+widget.english+"</center>"}   '''),
                   )),
                 ),
@@ -200,7 +201,7 @@ class _PujaOutputState extends State<PujaOutput>
                         Padding(
                           padding: EdgeInsets.only(right:5.0, left : 5),
                           child: CircularProgressIndicator(
-                            value: position != null && position!.inMilliseconds > 0 ? (position?.inMilliseconds.toDouble() ?? 0.0) / (duration?.inMilliseconds?.toDouble() ?? 0.0) : 0.0,
+                            value: position != null && position!.inMilliseconds > 0 ? (position?.inMilliseconds.toDouble() ?? 0.0) / (duration?.inMilliseconds.toDouble() ?? 0.0) : 0.0,
                             valueColor: AlwaysStoppedAnimation(Constants.BlueColor),
                             backgroundColor: Colors.grey[500],
                           ),

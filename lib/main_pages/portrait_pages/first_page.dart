@@ -5,6 +5,7 @@ import 'package:ganpati/constants.dart';
 import 'package:ganpati/ganesh_puja.dart';
 import 'package:ganpati/mantra_list.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:toast/toast.dart';
 import '../../first_tab_pages/parent_pages/image_files.dart';
 import '../../general_utility_functions.dart';
 import 'third_page.dart';
@@ -14,6 +15,7 @@ class FirstPage extends StatelessWidget
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>
@@ -93,7 +95,7 @@ class FirstPage extends StatelessWidget
           ),
         ),
         GestureDetector(
-          onTap: () async => await check() ? Navigator.of(context).push(MaterialPageRoute(builder: (context) => NavratriPuja(Constants.NationalSymbolsAPI, Constants.AppBarShayari))) : showToast(context, "INTERNET CONNECTION UNAVAILABLE"),
+          onTap: () async => await check() ? Navigator.of(context).push(MaterialPageRoute(builder: (context) => NavratriPuja(Constants.NationalSymbolsAPI, Constants.AppBarShayari))) : showToast("INTERNET CONNECTION UNAVAILABLE"),
           child: Padding(
             padding: const EdgeInsets.only(bottom: 5.0),
             child: Card(
@@ -156,7 +158,7 @@ class FirstPage extends StatelessWidget
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal:8.0),
       child: GestureDetector(
-        onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (context) => nextPage)) : showToast(context, "KINDLY CHECK YOUR INTERNET CONNECTION"),
+        onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (context) => nextPage)) : showToast("KINDLY CHECK YOUR INTERNET CONNECTION"),
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),

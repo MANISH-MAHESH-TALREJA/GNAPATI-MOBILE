@@ -1,184 +1,103 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
+import 'package:http/http.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'dart:convert';
-import 'package:http/http.dart';
-import 'package:ganpati/Models/ringtones_model.dart';
-import '../../constants.dart';
-import '../../audio_player.dart';
-import '../../main_pages/Other/app_bar_drawer.dart';
+import 'package:ganpati/constants.dart';
+import 'package:searchable_listview/searchable_listview.dart';
+import 'package:toast/toast.dart';
+
+import '../../general_utility_functions.dart';
+import '../../main_pages/other/app_bar_drawer.dart';
+import '../../models/ringtones_model.dart';
 import '../child_pages/ringtones_output.dart';
 
-// ignore: must_be_immutable
+//ignore: must_be_immutable
 class RingtoneFiles extends StatefulWidget
 {
   String url;
   List<String> titles;
-  RingtoneFiles(this.url, this.titles);
+  RingtoneFiles(this.url, this.titles, {super.key});
+
   @override
-  State<StatefulWidget> createState() => _RingtoneFilesState();
+  State<RingtoneFiles> createState() => _RingtoneFilesState();
 }
 
 class _RingtoneFilesState extends State<RingtoneFiles>
 {
-  var data;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isLoading = true;
+  List<RingtonesModel>? ringtonesModel;
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState()
   {
     super.initState();
-    initAudioPlayer();
-  }
-  Duration? duration;
-  Duration? position;
-  AudioPlayer? audioPlayer;
-  String? localFilePath;
-  PlayerState playerState = PlayerState.stopped;
-  get isPlaying => playerState == PlayerState.playing;
-  get isPaused => playerState == PlayerState.paused;
-  get durationText => duration != null ? duration.toString().split('.').first : '';
-  get positionText => position != null ? position.toString().split('.').first : '';
-  StreamSubscription? _positionSubscription;
-  StreamSubscription? _audioPlayerStateSubscription;
-
-  @override
-  void dispose()
-  {
-    _positionSubscription!.cancel();
-    _audioPlayerStateSubscription!.cancel();
-    audioPlayer!.stop();
-    super.dispose();
-  }
-
-  void initAudioPlayer()
-  {
-    audioPlayer = AudioPlayer();
-    _positionSubscription = audioPlayer!.onAudioPositionChanged.listen((p) => setState(() => position = p));
-    _audioPlayerStateSubscription =
-        audioPlayer!.onPlayerStateChanged.listen((s)
-        {
-          if (s == AudioPlayerState.PLAYING)
-          {
-            setState(() => duration = audioPlayer!.duration);
-          }
-          else if (s == AudioPlayerState.STOPPED)
-          {
-            onComplete();
-            setState(()
-            {
-              position = duration;
-            });
-          }
-        }, onError: (msg)
-        {
-          setState(()
-          {
-            playerState = PlayerState.stopped;
-            duration = Duration(seconds: 0);
-            position = Duration(seconds: 0);
-          });
-        });
-  }
-
-  Future play(String ringUrl) async
-  {
-    await audioPlayer!.play(ringUrl);
-    setState(()
+    Future.delayed(Duration.zero, ()
     {
-      playerState = PlayerState.playing;
+      fetchRingtones();
     });
+    ToastContext().init(context);
   }
 
-  Future stop() async
+  void fetchRingtones() async
   {
-    await audioPlayer!.stop();
-    setState(()
+    Response response;
+    response = await get(Uri.parse(widget.url));
+    if (response.statusCode == 200)
     {
-      playerState = PlayerState.stopped;
-      position = null;
-    });
-  }
-
-  void onComplete()
-  {
-    setState(() => playerState = PlayerState.stopped);
+      if(!mounted) return;
+      setState(()
+      {
+        isLoading = false;
+        ringtonesModel = ringtonesModelFromJson(response.body);
+      });
+    }
+    else
+    {
+      debugPrint(response.body.toString());
+      debugPrint(response.statusCode.toString());
+      if(!mounted) return;
+      failureFunction(context, super.widget);
+    }
   }
 
   @override
   Widget build(BuildContext context)
   {
-    return OrientationBuilder(
-        builder: (context, orientation)
-        {
-          return Scaffold(
-              key: _scaffoldKey,
-              appBar: RepublicDrawer().RepublicAppBar(context,widget.titles),
-              body: FutureBuilder(
-                future: getProductList(widget.url),
-                builder: (context, AsyncSnapshot snapshot)
-                {
-                  switch (snapshot.connectionState)
-                  {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                      return new RepublicDrawer().TirangaProgressBar(context, orientation);
-                    default:
-                      if (snapshot.hasError)
-                        return Center(child: Image.asset("assets/images/ganpati_09.gif"));
-                      else
-                        return createListView(context, snapshot, orientation);
-                  }
-                },
-              )
-          );
-        }
-    );
+    ToastContext().init(context);
+    return OrientationBuilder(builder: (context, orientation)
+    {
+      return Scaffold(
+        appBar: RepublicDrawer().RepublicAppBar(context,widget.titles),
+        body: isLoading ? RepublicDrawer().TirangaProgressBar(context, orientation) : specialListView(orientation),
+      );
+    });
   }
 
-  List<RingtonesModel>? categories;
-  Future<List<RingtonesModel>> getProductList(String page) async
-  {
-    Response response;
-    response = await get(Uri.parse(page));
-    int statusCode = response.statusCode;
-    final body = json.decode(response.body);
-    print(body);
-    if (statusCode == 200)
-    {
-      categories = (body as List).map((i) => RingtonesModel.fromJson(i)).toList();
-      return categories!;
-    }
-    else
-    {
-      return categories = [];
-    }
-  }
-
-  // ignore: non_constant_identifier_names
-  Widget TirangaCard(int index, RingtonesModel value, Orientation orientation)
+  Widget tirangaCard(int index, RingtonesModel value, Orientation orientation)
   {
     return GestureDetector(
-      onTap: () => showMaterialModalBottomSheet(context: context, builder: (context) => AudioApp(value.audioLink!, value.audioName!)),
+      onTap: () async => await check() ? Future.delayed(Duration.zero, () {
+
+        showMaterialModalBottomSheet(context: context, builder: (context) => AudioApp(value.audioLink!, value.audioName!));
+
+      }) : showToast("INTERNET CONNECTION UNAVAILABLE"),
       child: Padding(
-        padding: const EdgeInsets.all(5.0),
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
         child: Card(
             elevation: 2,
-            color: (index+1)%2==0 ?Constants.GreenColor:Color(0xFFFF33C9),
+            color: (index+1) % 2 == 0 ? Constants.GreenColor : Constants.OrangeColor,
             borderOnForeground: true,
-            //shadowColor: newColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
-            child: Container(
+            child: SizedBox(
               width: MediaQuery.of(context).size.width-20,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children:
                 [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround, children:
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children:
                   [
                     Padding(
                       padding: const EdgeInsets.all(5.0),
@@ -189,12 +108,15 @@ class _RingtoneFilesState extends State<RingtoneFiles>
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Container(width: orientation==Orientation.portrait?MediaQuery.of(context).size.width*0.7:MediaQuery.of(context).size.width*0.8,child: Marquee(
+                      child: SizedBox(width: orientation==Orientation.portrait?MediaQuery.of(context).size.width*0.7:MediaQuery.of(context).size.width*0.8,child: Marquee(
                           textDirection : TextDirection.ltr,
-                          animationDuration: Duration(seconds: 3),
+                          animationDuration: const Duration(seconds: 3),
                           directionMarguee: DirectionMarguee.oneDirection,
-                          child: Text(value.audioName!.toUpperCase(), maxLines: 2, //textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 20,color: (index+1)%2==0?Constants.BlueColor:Colors.white, fontFamily: Constants.AppFont, fontWeight: FontWeight.bold)))),
+                          child: Text(value.audioName!, maxLines: 2, //textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 16,color: (index+1)%2==0?Constants.BlueColor:Colors.white, fontFamily: Constants.AppFont, fontWeight: FontWeight.bold)
+                          )
+                      )
+                      ),
                     ),
                   ])
                 ],
@@ -205,17 +127,59 @@ class _RingtoneFilesState extends State<RingtoneFiles>
     );
   }
 
-  Widget createListView(BuildContext context, AsyncSnapshot snapshot, Orientation orientation)
+  Widget specialListView(Orientation orientation)
   {
-    List<RingtonesModel> data = snapshot.data;
-    return ListView.builder(
-      key: UniqueKey(),
-      itemCount: data.length,
-      itemBuilder: (context, index)
-      {
-        final value = data[index];
-        return TirangaCard(index, value, orientation);
-      },
+    int index = 0;
+    return Padding(
+      padding: const EdgeInsets.only(top:10, left: 10.0, right:10.0),
+      child: SearchableList<RingtonesModel>(
+        initialList: ringtonesModel!,
+        itemBuilder: (RingtonesModel ringtonesModel)
+        {
+          index++;
+          return tirangaCard(index, ringtonesModel, orientation);
+        },
+        filter: (value) => ringtonesModel!.where((element) => element.audioName!.toLowerCase().contains(value.toLowerCase())).toList(),
+        searchTextController: searchController,
+        inputDecoration: InputDecoration(
+          suffix: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: CircleAvatar(
+                radius: 15,
+                backgroundColor: Colors.grey[300],
+                child: IconButton(
+                  icon: const Icon(Icons.close, size: 15, color: Color(0xFF333333),),
+                  onPressed: ()
+                  {
+                    searchController.clear();
+                    setState(()
+                    {
+                      ringtonesModel;
+                    });
+                  },
+                ),
+              )
+          ),
+          hintText: "Search Ringtones",
+          hintStyle: const TextStyle(fontFamily: 'Poppins', color: Constants.GreenColor, fontSize: 14),
+          labelStyle: const TextStyle(fontFamily: 'Poppins', color: Color(0xFF333333), fontSize: 14),
+          border: const OutlineInputBorder(borderSide: BorderSide(
+              color: Constants.OrangeColor
+          )),
+          focusedBorder: const OutlineInputBorder(borderSide: BorderSide(
+              color: Constants.OrangeColor
+          )),
+          labelText: "Search Ringtones",
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+                icon: const Icon(Icons.search, size: 25),
+                color: const Color(0xFF333333),
+                onPressed: () {}),
+          ),
+          contentPadding: const EdgeInsets.only(right: 0, left: 10),
+        ),
+      ),
     );
   }
 }

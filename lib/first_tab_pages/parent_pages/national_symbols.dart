@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:ganpati/Models/national_detail_model.dart';
+import 'package:toast/toast.dart';
 
 import '../../constants.dart';
 import '../../general_utility_functions.dart';
@@ -27,6 +28,7 @@ class _NationalSymbolsState extends State<NationalSymbols>
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return OrientationBuilder(
         builder: (context, orientation)
         {
@@ -109,6 +111,7 @@ class ContactWidget extends StatelessWidget
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return ExpandableNotifier(
         child: Padding(
           padding: const EdgeInsets.all(10),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:ganpati/Models/image_model.dart';
+import 'package:toast/toast.dart';
 import '../../general_utility_functions.dart';
 import '../../main_pages/Other/app_bar_drawer.dart';
 import '../../second_tab_pages/child_pages/image_output.dart';
@@ -26,6 +27,7 @@ class _ImageFilesState extends State<ImageFiles>
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return OrientationBuilder(
         builder: (context, orientation)
         {
@@ -89,7 +91,7 @@ class _ImageFilesState extends State<ImageFiles>
         return Padding(
           padding: const EdgeInsets.all(5.0),
           child: GestureDetector(
-            onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (context) => ImageOutput(image: value.wallpaperImages!, imageType: widget.imageType,))) : showToast(context, "INTERNET CONNECTION UNAVAILABLE"),
+            onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (context) => ImageOutput(image: value.wallpaperImages!, imageType: widget.imageType,))) : showToast("INTERNET CONNECTION UNAVAILABLE"),
             child: Card(
               elevation: 2,
               shape: RoundedRectangleBorder(

@@ -1,87 +1,167 @@
-import 'package:connectivity/connectivity.dart';
+import 'dart:math';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:cross_connectivity/cross_connectivity.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:esys_flutter_share_plus/esys_flutter_share_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:giffy_dialog/giffy_dialog.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:set_ringtone/set_ringtone.dart';
 import 'package:toast/toast.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wc_flutter_share/wc_flutter_share.dart';
+import 'package:wallpaper/wallpaper.dart';
 import 'constants.dart';
-import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'notification_utility.dart';
 
-import 'android_version.dart';
 
-void showToast(BuildContext context, String message)
+void showToast(String message)
 {
   Toast.show(message, duration: Toast.lengthLong, gravity: Toast.bottom, backgroundColor: Constants.OrangeColor, textStyle: TextStyle(color: Constants.GreenColor));
 }
 
-Future<String> _findLocalPath() async
-{
-  var directory = await getExternalStorageDirectory();
-  return directory!.path;
-}
 
-Future<void> downloadMedia(BuildContext context, String url, String mediaFolder, String defaultFolder) async
+void newDownloadFunction(String url, String mediaFolder, String defaultFolder)
 {
-  Directory savedDir;
-  bool hasExisted;
-  String _localPath/*, mediaPath*/;
-  String mediaFileName  = DateTime.now().year.toString()+DateTime.now().month.toString()+DateTime.now().day.toString()+DateTime.now().hour.toString()+DateTime.now().minute.toString()+DateTime.now().second.toString()+DateTime.now().microsecond.toString()+".";
+  int min = 00;
+  int max = 99;
+  var randomizer = Random();
+  var rNum = min + randomizer.nextInt(max - min);
+  String mediaFileName  = "${DateTime.now().year}${DateTime.now().month}${DateTime.now().day}${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}${DateTime.now().microsecond}.";
   mediaFileName+=mediaChecker(url);
-  List <String> hi = (await _findLocalPath()).split("/");
-  String myFile=hi[0];
-  for(int i=1;i<hi.length-4;i++)
-  {
-    myFile+="/"+hi[i];
-  }
-  _localPath = myFile + Platform.pathSeparator + 'GANPATI DOWNLOADS';
-  savedDir = Directory(_localPath);
-  hasExisted = await savedDir.exists();
-  if (!hasExisted)
-  {
-    savedDir.create();
-  }
-  _localPath = _localPath + Platform.pathSeparator + mediaFolder;
-  savedDir = Directory(_localPath);
-  hasExisted = await savedDir.exists();
-  if (!hasExisted)
-  {
-    savedDir.create();
-  }
-  showToast(context, "YOUR DOWNLOAD STARTED. YOUR DOWNLOADED FILES ARE STORED INSIDE GANPATI DOWNLOADS FOLDER.");
-  await FlutterDownloader.enqueue(url: url, savedDir: _localPath, showNotification: true, openFileFromNotification: true, fileName:mediaFileName);
+  showToast('DOWNLOAD STARTED');
+  AwesomeNotifications().setListeners(
+      onActionReceivedMethod:         NotificationUtility.onActionReceivedMethod,
+      onNotificationCreatedMethod:    NotificationUtility.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:  NotificationUtility.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod:  NotificationUtility.onDismissActionReceivedMethod
+  );
+  FileDownloader.setLogEnabled(true);
+  FileDownloader.downloadFile(
+      url: url,
+      name: mediaFileName,
+      onProgress: (data, progress)
+      {
+        debugPrint(progress.toString());
+        debugPrint(progress.toInt().toString());
+      },
+      onDownloadCompleted: (String path)
+      {
+        if(defaultFolder.compareTo("Pictures") == 0)
+        {
+          AwesomeNotifications().createNotification(
+              actionButtons:
+              [
+                NotificationActionButton(key: "BUTTON - SHARE ${defaultFolder.toUpperCase()}", label: "SHARE $mediaFolder", color: Constants.BlueColor),
+                NotificationActionButton(key: "BUTTON - OPEN ${defaultFolder.toUpperCase()}", label: "VIEW $mediaFolder", color: Constants.BlueColor),
+              ],
+              content: NotificationContent(
+                id: rNum,
+                channelKey: 'GANPATI',
+                color: Constants.GreenColor,
+                backgroundColor: Constants.OrangeColor,
+                title: "$mediaFolder DOWNLOADED SUCCESSFULLY",
+                body: 'SAVED TO DOWNLOADS FOLDER',
+                actionType: ActionType.Default,
+                bigPicture: url,
+                roundedBigPicture: true,
+                notificationLayout: NotificationLayout.BigPicture,
+                category: NotificationCategory.Message,
+                payload:
+                {
+                  "LINK" : url,
+                  "MEDIA TYPE" : defaultFolder,
+                  "MEDIA NAME" : mediaFolder,
+                  "PATH" : path
+                },
+              )
+          );
+        }
+        if(defaultFolder.compareTo("Music") == 0 || defaultFolder.compareTo("Movies") == 0)
+        {
+          AwesomeNotifications().createNotification(
+              actionButtons:
+              [
+                if(mediaFolder.compareTo("NATIONAL SONG") == 1)
+                  NotificationActionButton(key: "BUTTON - SHARE ${defaultFolder.toUpperCase()}", label: "SHARE $mediaFolder", color: Constants.BlueColor),
+                NotificationActionButton(key: "BUTTON - OPEN ${defaultFolder.toUpperCase()}", label: "PLAY $mediaFolder", color: Constants.BlueColor),
+              ],
+              content: NotificationContent(
+                id: rNum,
+                channelKey: 'GANPATI',
+                color: Constants.GreenColor,
+                backgroundColor: Constants.OrangeColor,
+                title: "$mediaFolder DOWNLOADED SUCCESSFULLY",
+                body: 'SAVED TO DOWNLOADS FOLDER',
+                actionType: ActionType.Default,
+                notificationLayout: NotificationLayout.Default,
+                category: NotificationCategory.Message,
+                payload:
+                {
+                  "LINK" : url,
+                  "MEDIA TYPE" : defaultFolder,
+                  "MEDIA NAME" : mediaFolder,
+                  "PATH" : path
+                },
+              )
+          );
+        }
+        showToast('FILE DOWNLOADED TO PATH: $path');
+        debugPrint('FILE DOWNLOADED TO PATH: $path');
+      },
+      onDownloadError: (String error)
+      {
+        showToast('DOWNLOAD ERROR: $error');
+        debugPrint('DOWNLOAD ERROR: $error');
+      });
 }
 
-void saveMedia(BuildContext context, String url, String mediaFolder, String defaultFolder) async
+void mediaShare(String url, String media, String mediaType) async
 {
-  Map<dynamic, dynamic> _info = await initPlatformState();
-  var androidInformation = _info.values.toList();
-  if(androidInformation[1] >= 30.0)
+  showToast("PLEASE WAIT !!!!");
+  if(await check())
   {
-    showToast(context, "DOWNLOADING IS UNFORTUNATELY NOT SUPPORTED IN ANDROID 11 MOBILE PHONE. YOU CAN SHARE THE MEDIA USING THE SHARE BUTTON");
+    var response = await http.get(Uri.parse(url));
+    await Share.file('GANPATI $media', 'GANPATI.${mediaChecker(url)}', response.bodyBytes.buffer.asUint8List(), '$mediaType/${mediaChecker(url)}', text: 'SHARE GANPATI $media');
   }
   else
   {
-    if(await check())
+    showToast("KINDLY CHECK YOUR INTERNET CONNECTION");
+  }
+}
+
+
+void saveMedia(BuildContext context, String url, String mediaFolder, String defaultFolder) async
+{
+  if(await check())
+  {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    if(androidInfo.version.sdkInt >= 33.0)
     {
-      PermissionStatus permissionStatus = await Permission.storage.status;
-      if(permissionStatus.isGranted)
+      PermissionStatus permissionStatus01 = await Permission.audio.status;
+      PermissionStatus permissionStatus02 = await Permission.videos.status;
+      PermissionStatus permissionStatus03 = await Permission.photos.status;
+      PermissionStatus permissionStatus04 = await Permission.notification.status;
+      if(permissionStatus01.isGranted && permissionStatus02.isGranted && permissionStatus03.isGranted && permissionStatus04.isGranted)
       {
-        downloadMedia(context, url, mediaFolder, defaultFolder);
+        newDownloadFunction(url, mediaFolder, defaultFolder);
       }
       else
       {
-        await Permission.storage.request();
-        PermissionStatus permissionStatus = await Permission.storage.status;
-        if(permissionStatus.isGranted)
+        await Permission.audio.request();
+        await Permission.videos.request();
+        await Permission.photos.request();
+        await Permission.notification.request();
+        PermissionStatus permissionStatus01 = await Permission.audio.status;
+        PermissionStatus permissionStatus02 = await Permission.videos.status;
+        PermissionStatus permissionStatus03 = await Permission.photos.status;
+        PermissionStatus permissionStatus04 = await Permission.notification.status;
+        if(permissionStatus01.isGranted && permissionStatus02.isGranted && permissionStatus03.isGranted && permissionStatus04.isGranted)
         {
-          downloadMedia(context, url, mediaFolder, defaultFolder);
+          newDownloadFunction(url, mediaFolder, defaultFolder);
         }
         else
         {
@@ -89,36 +169,86 @@ void saveMedia(BuildContext context, String url, String mediaFolder, String defa
               animationType: AnimationType.fromTop,
               isCloseButton: false,
               isOverlayTapDismiss: false,
-              animationDuration: Duration(milliseconds: 500),
-              alertBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: Colors.pink,),),
-              titleStyle: TextStyle(color: Colors.red)),
-              title: "PERMISSION DENIED", desc: "KINDLY ALLOW THE PERMISSION IN ORDER TO SAVE "+mediaFolder+" TO STORAGE AND SHARE",
+              animationDuration: const Duration(milliseconds: 500),
+              alertBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: Colors.pink,),),
+              titleStyle: const TextStyle(color: Colors.red)),
+              title: "PERMISSION DENIED", desc: "KINDLY ALLOW THE PERMISSION IN ORDER TO SAVE $mediaFolder TO STORAGE AND SHARE",
               buttons:
               [
-                DialogButton(child: Text("RETRY", style: TextStyle(color: Colors.white, fontSize: 20)),
-                    onPressed: () async
-                    {
-                      Navigator.pop(context);
-                      await Permission.storage.request();
-                      PermissionStatus permissionStatus = await Permission.storage.status;
-                      if(permissionStatus.isGranted)
-                      {
-                        downloadMedia(context, url, mediaFolder, defaultFolder);
-                      }
-                    }, width: 120),
-                DialogButton(child: Text("CANCEL", style: TextStyle(color: Colors.white, fontSize: 20)),
-                    onPressed: () async
-                    {
-                      Navigator.pop(context);
-                    }, width: 120)
+                DialogButton(onPressed: () async
+                {
+                  Navigator.pop(context);
+                  await Permission.audio.request();
+                  await Permission.videos.request();
+                  await Permission.photos.request();
+                  await Permission.notification.request();
+                  PermissionStatus permissionStatus01 = await Permission.audio.status;
+                  PermissionStatus permissionStatus02 = await Permission.videos.status;
+                  PermissionStatus permissionStatus03 = await Permission.photos.status;
+                  PermissionStatus permissionStatus04 = await Permission.notification.status;
+                  if(permissionStatus01.isGranted && permissionStatus02.isGranted && permissionStatus03.isGranted && permissionStatus04.isGranted)
+                  {
+                    newDownloadFunction(url, mediaFolder, defaultFolder);
+                  }
+                }, width: 120, child: const Text("RETRY", style: TextStyle(color: Colors.white, fontSize: 20))),
+                DialogButton(onPressed: () async
+                {
+                  Navigator.pop(context);
+                }, width: 120, child: const Text("CANCEL", style: TextStyle(color: Colors.white, fontSize: 20)))
               ]).show();
         }
       }
     }
     else
     {
-      showToast(context, "KINDLY CHECK YOUR INTERNET CONNECTION");
+      PermissionStatus permissionStatus = await Permission.storage.status;
+      if(permissionStatus.isGranted)
+      {
+        newDownloadFunction(url, mediaFolder, defaultFolder);
+      }
+      else
+      {
+        await Permission.storage.request();
+        PermissionStatus permissionStatus = await Permission.storage.status;
+        if(permissionStatus.isGranted)
+        {
+          newDownloadFunction(url, mediaFolder, defaultFolder);
+        }
+        else
+        {
+          Alert(context: context, type: AlertType.error, style: AlertStyle(
+              animationType: AnimationType.fromTop,
+              isCloseButton: false,
+              isOverlayTapDismiss: false,
+              animationDuration: const Duration(milliseconds: 500),
+              alertBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: Colors.pink,),),
+              titleStyle: const TextStyle(color: Colors.red)),
+              title: "PERMISSION DENIED", desc: "KINDLY ALLOW THE PERMISSION IN ORDER TO SAVE $mediaFolder TO STORAGE AND SHARE",
+              buttons:
+              [
+                DialogButton(onPressed: () async
+                {
+                  Navigator.pop(context);
+                  await Permission.storage.request();
+                  PermissionStatus permissionStatus = await Permission.storage.status;
+                  if(permissionStatus.isGranted)
+                  {
+                    newDownloadFunction(url, mediaFolder, defaultFolder);
+                  }
+                }, width: 120, child: const Text("RETRY", style: TextStyle(color: Colors.white, fontSize: 20))),
+                DialogButton(onPressed: () async
+                {
+                  Navigator.pop(context);
+                }, width: 120, child: const Text("CANCEL", style: TextStyle(color: Colors.white, fontSize: 20)))
+              ]).show();
+        }
+      }
     }
+
+  }
+  else
+  {
+    showToast("KINDLY CHECK YOUR INTERNET CONNECTION");
   }
 }
 
@@ -152,26 +282,11 @@ String mediaChecker(String url)
   return extension;
 }
 
-void mediaShare(BuildContext context, String url, String media, String mediaType) async
-{
-  showToast(context,"PLEASE WAIT !!!!");
-  if(await check())
-  {
-    var response = await http.get(Uri.parse(url));
-    await WcFlutterShare.share(
-        sharePopupTitle: 'SHARE GANPATI '+media,
-        fileName: 'GANPATI.'+mediaChecker(url),
-        mimeType: mediaType+'/'+mediaChecker(url),
-        bytesOfFile: response.bodyBytes.buffer.asUint8List());
-  }
-  else
-  {
-    showToast(context, "KINDLY CHECK YOUR INTERNET CONNECTION");
-  }
-}
+
 
 void launchLink(String link)
 {
+  // ignore: unnecessary_null_comparison
   if (canLaunchUrl(Uri.parse(link)) != null)
   {
     launchUrl(Uri.parse(link));
@@ -182,90 +297,305 @@ void launchLink(String link)
   }
 }
 
+void failureFunction(BuildContext context, Widget refreshWidget)
+{
+  showDialog(
+      context: context,
+      builder: (_) => GiffyDialog.image(Image.asset("assets/images/indian_flag.gif"),
+        title: const Text(
+          'REQUEST FAILED',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 22.0,
+              fontWeight: FontWeight.w600,
+              color: Constants.OrangeColor),
+        ),
+        content: const Text(
+          'SOME ERROR OCCURRED. PLEASE TRY AGAIN',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: Constants.GreenColor,
+              fontWeight: FontWeight.bold),
+        ),
+        entryAnimation: EntryAnimation.topLeft,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                    style: ButtonStyle(
+                        foregroundColor: WidgetStateProperty.all<Color>(Constants.OrangeColor),
+                        backgroundColor: WidgetStateProperty.all<Color>(Constants.OrangeColor),
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.00),
+                                side: const BorderSide(color: Constants.GreenColor)
+                            )
+                        )
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => refreshWidget));
+                    },
+                    child: SizedBox(
+                      width: 100,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Icon(Icons.refresh, color: Colors.white,),
+                            const SizedBox(width: 10,),
+                            Text(
+                                "OK".toUpperCase(),
+                                style: const TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold)
+                            ),
+                          ]
+                      ),
+                    )
+                ),
+                ElevatedButton(
+                    style: ButtonStyle(
+                        foregroundColor: WidgetStateProperty.all<Color>(Constants.OrangeColor),
+                        backgroundColor: WidgetStateProperty.all<Color>(Constants.OrangeColor),
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.00),
+                                side: const BorderSide(color: Constants.GreenColor)
+                            )
+                        )
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    },
+                    child: SizedBox(
+                      width: 100,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Icon(Icons.cancel_outlined, color: Colors.white,),
+                            const SizedBox(width: 10,),
+                            Text(
+                                "CANCEL".toUpperCase(),
+                                style: const TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold)
+                            ),
+                          ]
+                      ),
+                    )
+                ),
+              ],
+            ),
+          )
+
+        ],
+      )
+  );
+}
+
 void setWallpaperScreen(BuildContext context, String url, String screen, int type) async
 {
-  int location = type;
-  showToast(context, "PLEASE WAIT !!!!");
-  var file = await DefaultCacheManager().getSingleFile(url);
-  await WallpaperManager.setWallpaperFromFile(file.path, location);
-  showToast(context, screen+" WALLPAPER CHANGED SUCCESSFULLY !!!!");
+  late Stream<String> progressString = Wallpaper.imageDownloadProgress(url, imageName: "GANPATI-IMAGE", location: DownloadLocation.TEMPORARY_DIRECTORY);
+  progressString.listen((data)
+  {
+    showToast("PLEASE WAIT WE ARE WORKING !!!!");
+  }, onDone: () async
+  {
+    switch(type)
+    {
+      case 1:
+        await Wallpaper.homeScreen(imageName: "GANPATI-IMAGE", location: DownloadLocation.TEMPORARY_DIRECTORY, options: RequestSizeOptions.RESIZE_FIT, width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height);
+        showToast("$screen WALLPAPER CHANGED SUCCESSFULLY !!!!");
+        break;
+      case 2:
+        await Wallpaper.lockScreen(imageName: "GANPATI-IMAGE", location: DownloadLocation.TEMPORARY_DIRECTORY, options: RequestSizeOptions.RESIZE_FIT, width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height);
+        showToast("$screen WALLPAPER CHANGED SUCCESSFULLY !!!!");
+        break;
+      case 3:
+        await Wallpaper.bothScreen(imageName: "GANPATI-IMAGE", location: DownloadLocation.TEMPORARY_DIRECTORY, options: RequestSizeOptions.RESIZE_FIT, width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height);
+        showToast("$screen WALLPAPER CHANGED SUCCESSFULLY !!!!");
+        break;
+      default:
+        showToast("WRONG SCREEN SPECIFIED");
+    }
+  }, onError: (error)
+  {
+    showToast("FAILED TO SET WALLPAPER");
+  });
+}
+
+
+void setRingtoneScreen(BuildContext context, String url, int type) async
+{
+  bool status = false;
+  String ringtoneType = "";
+  showToast("PLEASE WAIT !!!!");
+  if(type == 0)
+  {
+    status = await Ringtone.setAlarmFromNetwork(url);
+    ringtoneType = "ALARM";
+  }
+  if(type == 1)
+  {
+    status = await Ringtone.setRingtoneFromNetwork(url);
+    ringtoneType = "CALL";
+  }
+  if(type == 2)
+  {
+    status = await Ringtone.setNotificationFromNetwork(url);
+    ringtoneType = "NOTIFICATION";
+  }
+  if(status)
+  {
+    showToast("$ringtoneType RINGTONE CHANGED SUCCESSFULLY !!!!");
+  }
+  else
+  {
+    showToast("$ringtoneType RINGTONE CHANGED FAILED !!!!");
+  }
+
 }
 
 void setWallpaper(BuildContext context, String url, String screen, int type) async
 {
-  PermissionStatus permissionStatus = await Permission.storage.status;
-  if(permissionStatus.isGranted)
+  if(await check())
   {
     setWallpaperScreen(context, url, screen, type);
   }
   else
   {
-    await Permission.storage.request();
-    PermissionStatus permissionStatus = await Permission.storage.status;
-    if(permissionStatus.isGranted)
+    showToast("KINDLY CHECK YOUR INTERNET CONNECTION");
+  }
+}
+
+void setRingtone(BuildContext context, String url, int type) async
+{
+  if(await check())
+  {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    if(androidInfo.version.sdkInt >= 33.0)
     {
-      setWallpaperScreen(context, url, screen, type);
+      PermissionStatus permissionStatus01 = await Permission.audio.status;
+      PermissionStatus permissionStatus02 = await Permission.videos.status;
+      PermissionStatus permissionStatus03 = await Permission.photos.status;
+      PermissionStatus permissionStatus04 = await Permission.notification.status;
+      if(permissionStatus01.isGranted && permissionStatus02.isGranted && permissionStatus03.isGranted && permissionStatus04.isGranted)
+      {
+        setRingtoneScreen(context, url, type);
+      }
+      else
+      {
+        await Permission.audio.request();
+        await Permission.videos.request();
+        await Permission.photos.request();
+        await Permission.notification.request();
+        PermissionStatus permissionStatus01 = await Permission.audio.status;
+        PermissionStatus permissionStatus02 = await Permission.videos.status;
+        PermissionStatus permissionStatus03 = await Permission.photos.status;
+        PermissionStatus permissionStatus04 = await Permission.notification.status;
+        if(permissionStatus01.isGranted && permissionStatus02.isGranted && permissionStatus03.isGranted && permissionStatus04.isGranted)
+        {
+          setRingtoneScreen(context, url, type);
+        }
+        else
+        {
+          Alert(context: context, type: AlertType.error, style: AlertStyle(
+              animationType: AnimationType.fromTop,
+              isCloseButton: false,
+              isOverlayTapDismiss: false,
+              animationDuration: const Duration(milliseconds: 500),
+              alertBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: Colors.pink,),),
+              titleStyle: const TextStyle(color: Colors.red)),
+              title: "PERMISSION DENIED", desc: "KINDLY ALLOW THE PERMISSION TO SET RINGTONE",
+              buttons: [
+                DialogButton(onPressed: () async
+                {
+                  Navigator.pop(context);
+                  await Permission.audio.request();
+                  await Permission.videos.request();
+                  await Permission.photos.request();
+                  await Permission.notification.request();
+                  PermissionStatus permissionStatus01 = await Permission.audio.status;
+                  PermissionStatus permissionStatus02 = await Permission.videos.status;
+                  PermissionStatus permissionStatus03 = await Permission.photos.status;
+                  PermissionStatus permissionStatus04 = await Permission.notification.status;
+                  if(permissionStatus01.isGranted && permissionStatus02.isGranted && permissionStatus03.isGranted && permissionStatus04.isGranted)
+                  {
+
+                    setRingtoneScreen(context, url, type);
+                  }
+                }, width: 120, child: const Text("RETRY", style: TextStyle(color: Colors.white, fontSize: 20))),
+                DialogButton(onPressed: () async
+                {
+                  Navigator.pop(context);
+                }, width: 120, child: const Text("CANCEL", style: TextStyle(color: Colors.white, fontSize: 20)))
+              ]).show();
+        }
+      }
     }
     else
     {
-      Alert(context: context, type: AlertType.error, style: AlertStyle(
-          animationType: AnimationType.fromTop,
-          isCloseButton: false,
-          isOverlayTapDismiss: false,
-          animationDuration: Duration(milliseconds: 500),
-          alertBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: Colors.pink,),),
-          titleStyle: TextStyle(color: Colors.red)),
-          title: "PERMISSION DENIED", desc: "KINDLY ALLOW THE PERMISSION IN ORDER TO SET WALLPAPER AS HOME SCREEN BACKGROUND",
-          buttons: [
-            DialogButton(child: Text("RETRY", style: TextStyle(color: Colors.white, fontSize: 20)),
-                onPressed: () async
+      PermissionStatus permissionStatus = await Permission.storage.status;
+      if(permissionStatus.isGranted)
+      {
+        setRingtoneScreen(context, url, type);
+      }
+      else
+      {
+        await Permission.storage.request();
+        PermissionStatus permissionStatus = await Permission.storage.status;
+        if(permissionStatus.isGranted)
+        {
+          setRingtoneScreen(context, url, type);
+        }
+        else
+        {
+          Alert(context: context, type: AlertType.error, style: AlertStyle(
+              animationType: AnimationType.fromTop,
+              isCloseButton: false,
+              isOverlayTapDismiss: false,
+              animationDuration: const Duration(milliseconds: 500),
+              alertBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: Colors.pink,),),
+              titleStyle: const TextStyle(color: Colors.red)),
+              title: "PERMISSION DENIED", desc: "KINDLY ALLOW THE PERMISSION TO SET RINGTONE",
+              buttons: [
+                DialogButton(onPressed: () async
                 {
                   Navigator.pop(context);
                   await Permission.storage.request();
                   PermissionStatus permissionStatus = await Permission.storage.status;
                   if(permissionStatus.isGranted)
                   {
-                    setWallpaperScreen(context, url, screen, type);
+                    setRingtoneScreen(context, url, type);
                   }
-                }, width: 120),
-            DialogButton(child: Text("CANCEL", style: TextStyle(color: Colors.white, fontSize: 20)),
-                onPressed: () async
+                }, width: 120, child: const Text("RETRY", style: TextStyle(color: Colors.white, fontSize: 20))),
+                DialogButton(onPressed: () async
                 {
                   Navigator.pop(context);
-                }, width: 120)
-          ]).show();
+                }, width: 120, child: const Text("CANCEL", style: TextStyle(color: Colors.white, fontSize: 20)))
+              ]).show();
+        }
+      }
     }
+  }
+  else
+  {
+    showToast("KINDLY CHECK YOUR INTERNET CONNECTION");
   }
 
 }
 
 void shareMe()
 {
-  WcFlutterShare.share(
-      sharePopupTitle: 'SHARE GANPATI APP',
-      subject: 'GANPATI BAPPA - JAI SHREE GANESH',
-      text: "SHARE GANPATI BAPPA - VIRTUAL GANPATI BAPPA CELEBRATION APP MADE BY RAAM DEVELOPERS. YOU CAN DOWNLOAD THE APP BY CLICKING ON THE LINK BELOW FROM GOOGLE PLAY STORE. \n\n"+Constants.AppPlayStoreLink,
-      mimeType: 'text/plain');
-}
-
-Future<Map<dynamic, dynamic>> initPlatformState() async
-{
-  Map<dynamic, dynamic>? info;
-  try
-  {
-    info = await AndroidInfo.version;
-  }
-  on PlatformException
-  {
-    info = {'error': 'Failed to get platform version.'};
-  }
-  return info!;
+  Share.text('SHARE GANPATI APP',
+      "SHARE GANPATI BAPPA - VIRTUAL GANPATI BAPPA CELEBRATION APP MADE BY RAAM DEVELOPERS. YOU CAN DOWNLOAD THE APP BY CLICKING ON THE LINK BELOW FROM GOOGLE PLAY STORE. \n\n"+Constants.AppPlayStoreLink, 'text/plain');
 }
 
 Future<bool> check() async
 {
   var result = await (Connectivity().checkConnectivity());
-  if (result == ConnectivityResult.none)
+  if (result == ConnectivityStatus.none)
   {
     return false;
   }
@@ -274,4 +604,3 @@ Future<bool> check() async
     return true;
   }
 }
-

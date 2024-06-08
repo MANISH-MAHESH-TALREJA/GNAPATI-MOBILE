@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ganpati/constants.dart';
+import 'package:toast/toast.dart';
 import '../../first_tab_pages/parent_pages/image_files.dart';
 import '../../first_tab_pages/parent_pages/national_songs.dart';
 import '../../first_tab_pages/parent_pages/national_symbols.dart';
@@ -18,6 +19,7 @@ class _SecondPageState extends State<SecondPage>
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -25,14 +27,14 @@ class _SecondPageState extends State<SecondPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children:
           [
-            NavratriCard("assets/images/ganpati_05.gif", Color(0xFFFF9500), "AARTI",NationalSongs(Constants.NationalSongsAPI, Constants.AppBarSongs)),
+            NavratriCard("assets/images/ganpati_05.gif", Color(0xFFFF9500), "AARTI",NationalSongsList(Constants.NationalSongsAPI, Constants.AppBarSongs)),
             NavratriCard("assets/images/ganpati_03.gif", Color(0xFFFF9500), "STATUS",VideoFiles(Constants.VideoStatusAPI, Constants.AppBarStatus)),
           ],
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
           child: GestureDetector(
-            onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> NationalSymbols(Constants.UnknownFactsAPI, Constants.AppBarIndia))) : showToast(context, "KINDLY CHECK YOUR INTERNET CONNECTION"),
+            onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> NationalSymbols(Constants.UnknownFactsAPI, Constants.AppBarIndia))) : showToast("KINDLY CHECK YOUR INTERNET CONNECTION"),
             child: Stack(
               children:
               [
@@ -86,7 +88,7 @@ class _SecondPageState extends State<SecondPage>
                     child: Text(
                       'जय श्री गणेश',textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: Colors.white, fontSize: 22.0, fontWeight: FontWeight.bold),
+                          color: Colors.white, fontSize: 26.0, fontWeight: FontWeight.bold),
                     ),
                   ),
                 )
@@ -98,8 +100,8 @@ class _SecondPageState extends State<SecondPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children:
           [
-            NavratriCard("assets/images/ganpati_09.gif", Constants.GreenColor, "WALLPAPER",ImageFiles(Constants.WallpaperAPI, Constants.AppBarWallpaper,"WALLPAPER")),
-            NavratriCard("assets/images/ganpati_10.gif", Constants.GreenColor, "RINGTONE",RingtoneFiles(Constants.RingtoneAPI, Constants.AppBarRingtone)),
+            NavratriCard("assets/images/ganpati_09.gif", Constants.GreenColor, "WALLPAPER", ImageFiles(Constants.WallpaperAPI, Constants.AppBarWallpaper,"WALLPAPER")),
+            NavratriCard("assets/images/ganpati_10.gif", Constants.GreenColor, "RINGTONE", RingtoneFiles(Constants.RingtoneAPI, Constants.AppBarRingtone)),
           ],
         ),
       ],
@@ -112,7 +114,7 @@ class _SecondPageState extends State<SecondPage>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: GestureDetector(
-        onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> NavratriWidget)) : showToast(context, "KINDLY CHECK YOUR INTERNET CONNECTION"),
+        onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> NavratriWidget)) : showToast("KINDLY CHECK YOUR INTERNET CONNECTION"),
         child: Stack(
           children:
           [

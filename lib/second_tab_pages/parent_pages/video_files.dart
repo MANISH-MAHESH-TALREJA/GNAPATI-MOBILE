@@ -6,6 +6,7 @@ import 'package:ganpati/general_utility_functions.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:ganpati/Models/video_status_model.dart';
+import 'package:toast/toast.dart';
 
 import '../../main_pages/Other/app_bar_drawer.dart';
 
@@ -27,6 +28,7 @@ class _VideoFilesState extends State<VideoFiles>
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return OrientationBuilder(
         builder: (context, orientation)
         {
@@ -113,14 +115,14 @@ class _VideoFilesState extends State<VideoFiles>
                           configuration: BetterPlayerConfiguration(
                               controlsConfiguration: BetterPlayerControlsConfiguration(
                                   controlBarHeight: 35,
-                                  iconsColor: Constants.BlueColor,
+                                  iconsColor: Constants.WhiteColor,
                                   enableFullscreen: false,
                                   enableSubtitles: false,
                                   enableQualities: false,
                                   enableAudioTracks: false,
                                   overflowMenuIcon: Icons.file_download,
                                   enablePlaybackSpeed: false,
-                                  overflowModalColor: Constants.OrangeColor,
+                                  overflowModalColor: Constants.GreenColor,
                                   overflowMenuCustomItems:
                                   [
                                     BetterPlayerOverflowMenuItem(
@@ -131,7 +133,7 @@ class _VideoFilesState extends State<VideoFiles>
                                     BetterPlayerOverflowMenuItem(
                                       Icons.share_outlined,
                                       "SHARE VIDEO STATUS",
-                                          () => mediaShare(context, value.videoUrl!, "VIDEO STATUS", "video"),
+                                          () => mediaShare(value.videoUrl!, "VIDEO STATUS", "video"),
                                     )
                                   ],
                                   enableSkips: false

@@ -3,6 +3,7 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ganpati/general_utility_functions.dart';
+import 'package:toast/toast.dart';
 import '../../constants.dart';
 import 'package:in_app_update/in_app_update.dart';
 
@@ -32,6 +33,7 @@ class _PortraitMainPageState extends State<PortraitMainPage>
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return Scaffold(
         appBar: RepublicDrawer().RepublicAppBar(context,Constants.OutputAppBarTitle),
         //drawer: RepublicDrawer(),
@@ -68,13 +70,37 @@ class _PortraitMainPageState extends State<PortraitMainPage>
             ),
           ],
         ),
-        body: WillPopScope(
-            onWillPop: onWillPop,
+        body: PopScope(
+            canPop: canPopNow,
+            onPopInvoked: onPopInvoked,
             child: changePage()
         )
     );
   }
-
+  bool canPopNow = false;
+  int requiredSeconds = 2;
+  void onPopInvoked(bool didPop) {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime!) >
+            Duration(seconds: requiredSeconds)) {
+      currentBackPressTime = now;
+      showToast("PRESS BACK BUTTON AGAIN TO EXIT");
+      Future.delayed(
+        Duration(seconds: requiredSeconds),
+            () {
+          // Disable pop invoke and close the toast after 2s timeout
+          setState(() {
+            canPopNow = false;
+          });
+        },
+      );
+      // Ok, let user exit app on the next back press
+      setState(() {
+        canPopNow = true;
+      });
+    }
+  }
   Widget changePage()
   {
     if(_currentIndex==0)
@@ -94,8 +120,8 @@ class _PortraitMainPageState extends State<PortraitMainPage>
               AvatarGlow(
                   glowCount: 2,
                   glowRadiusFactor: 0.4,
-                  duration: Duration(seconds: 2),
-                  glowColor: Colors.orangeAccent,
+                  glowColor: Colors.pinkAccent,
+                  duration: const Duration(milliseconds: 2000),
                   repeat: true,
                   // repeatPauseDuration: Duration(seconds: 2),
                   startDelay: Duration(seconds: 1),
@@ -103,19 +129,19 @@ class _PortraitMainPageState extends State<PortraitMainPage>
                     backgroundColor: Colors.transparent,
                     child: Image.asset(
                       "assets/images/app_icon.png",
-                      height: 100,
+                      height: 125,
                       fit: BoxFit.fill,
-                      width: 250,
+                      width: 300,
                     ),
                     radius: 50,
                   )
               ),
             Padding(
-              padding: const EdgeInsets.only(bottom:20.0),
+              padding: const EdgeInsets.only(bottom:20.0, top: 50.0),
               child: SizedBox(
                 width: MediaQuery.of(context).size.width-25,
                 child: TyperAnimatedTextKit(
-                  onTap: () => showToast(context, "HAPPY GANESH CHATURTHI"),
+                  onTap: () => showToast("HAPPY GANESH CHATURTHI"),
                   speed: Duration(milliseconds: 250),
                   isRepeatingAnimation: true,
                   repeatForever: true,
@@ -282,7 +308,7 @@ class _PortraitMainPageState extends State<PortraitMainPage>
     if (currentBackPressTime == null || now.difference(currentBackPressTime!) > Duration(seconds: 2))
     {
       currentBackPressTime = now;
-      showToast(context, "PRESS BACK BUTTON AGAIN TO EXIT");
+      showToast("PRESS BACK BUTTON AGAIN TO EXIT");
       return Future.value(false);
     }
     return Future.value(true);

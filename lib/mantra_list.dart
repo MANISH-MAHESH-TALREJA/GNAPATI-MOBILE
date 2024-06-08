@@ -4,6 +4,7 @@ import 'package:marquee_widget/marquee_widget.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:ganpati/Models/mantra_model.dart';
+import 'package:toast/toast.dart';
 import '../../constants.dart';
 import 'main_pages/Other/app_bar_drawer.dart';
 
@@ -25,6 +26,7 @@ class _MantraListState extends State<MantraList>
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return OrientationBuilder(
         builder: (context, orientation)
         {
@@ -59,7 +61,7 @@ class _MantraListState extends State<MantraList>
     Response response;
     response = await get(Uri.parse(page));
     int statusCode = response.statusCode;
-    final body = json.decode(response.body);
+    final body = json.decode(utf8.decode(response.bodyBytes));
     print(body);
     if (statusCode == 200)
     {

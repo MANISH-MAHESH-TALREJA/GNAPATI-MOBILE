@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
+import 'package:toast/toast.dart';
 import 'constants.dart';
 import 'main_pages/Other/app_bar_drawer.dart';
 import 'puja_output.dart';
@@ -26,6 +27,7 @@ class _NavratriPujaState extends State<NavratriPuja>
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return OrientationBuilder(
         builder: (context, orientation)
         {
@@ -83,16 +85,17 @@ class _NavratriPujaState extends State<NavratriPuja>
           alignment: TabBarAlignment.center,
           labelPadding: const EdgeInsets.symmetric(
             horizontal: 10.0,
-            vertical: 8.0,
           ),
           indicator: ContainerTabIndicator(
             radius: BorderRadius.circular(10.0),
             color: Constants.GreenColor,
+            padding: EdgeInsets.only(left: 5.0, right: 5.0),
             borderWidth: 2.0,
             borderColor: Constants.OrangeColor,
           ),
+        indicatorSize: TabBarIndicatorSize.tab,
           labelColor: Colors.white,
-          unselectedLabelColor: Colors.grey[400]),
+          /*unselectedLabelColor: Colors.grey[400]*/),
 
       views: [PujaOutput(data[2].link!, data[2].english!, data[2].hindi!), PujaOutput(data[1].link!, data[1].english!, data[1].hindi!), PujaOutput(data[0].link!, data[0].english!, data[0].hindi!)],
       onChange: (index) => print(index),

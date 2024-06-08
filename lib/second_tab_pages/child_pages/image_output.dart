@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:ganpati/constants.dart';
 import 'package:ganpati/general_utility_functions.dart';
+import 'package:toast/toast.dart';
 import '../../main_pages/Other/app_bar_drawer.dart';
 
 // ignore: must_be_immutable
@@ -20,6 +20,7 @@ class _ImageOutputState extends State<ImageOutput>
   @override
   Widget build(BuildContext context) 
   {
+    ToastContext().init(context);
     return Scaffold(
       appBar: RepublicDrawer().RepublicAppBar(context,Constants.OutputAppBarTitle),
       body: Center(
@@ -73,28 +74,28 @@ class _ImageOutputState extends State<ImageOutput>
               backgroundColor: Colors.red,
               label: 'SHARE '+widget.imageType,
               labelStyle: TextStyle(fontSize: 18.0),
-              onTap: () => mediaShare(context, widget.image, widget.imageType, "image")
+              onTap: () => mediaShare(widget.image, widget.imageType, "image")
           ),
           SpeedDialChild(
             child: Icon(Icons.home),
             backgroundColor: Colors.blue,
             label: 'SET AS HOME SCREEN',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () async => setWallpaper(context, widget.image, "HOME SCREEN", WallpaperManager.HOME_SCREEN)
+            onTap: () async => setWallpaper(context, widget.image, "HOME SCREEN", 1)
           ),
           SpeedDialChild(
             child: Icon(Icons.lock),
             backgroundColor: Constants.GreenColor,
             label: 'SET AS LOCK SCREEN',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () async => setWallpaper(context, widget.image, "LOCK SCREEN", WallpaperManager.LOCK_SCREEN)
+            onTap: () async => setWallpaper(context, widget.image, "LOCK SCREEN", 2)
           ),
           SpeedDialChild(
             child: Icon(Icons.mobile_friendly),
             backgroundColor: Colors.pinkAccent,
             label: 'SET AS BOTH SCREENS',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () async => setWallpaper(context, widget.image, "HOME SCREEN AND LOCK SCREEN", WallpaperManager.BOTH_SCREEN),
+            onTap: () async => setWallpaper(context, widget.image, "HOME SCREEN AND LOCK SCREEN", 3),
           ),
         ],
       ),

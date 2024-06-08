@@ -1,100 +1,103 @@
-import 'package:flutter/material.dart';
-import 'package:marquee_widget/marquee_widget.dart';
-import 'dart:convert';
+import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:http/http.dart';
-import 'package:ganpati/Models/national_songs_model.dart';
+import 'package:marquee_widget/marquee_widget.dart';
+import 'package:searchable_listview/searchable_listview.dart';
+import 'package:toast/toast.dart';
+
 import '../../constants.dart';
 import '../../general_utility_functions.dart';
-import '../../main_pages/Other/app_bar_drawer.dart';
+import '../../main_pages/other/app_bar_drawer.dart';
+import '../../models/national_songs_model.dart';
 import '../child_pages/national_songs_output.dart';
 
-// ignore: must_be_immutable
-class NationalSongs extends StatefulWidget
+//ignore: must_be_immutable
+class NationalSongsList extends StatefulWidget
 {
   String url;
   List<String> titles;
-  NationalSongs(this.url, this.titles);
+  NationalSongsList(this.url, this.titles, {super.key});
+
   @override
-  State<StatefulWidget> createState() => _NationalSongsState();
+  State<NationalSongsList> createState() => _NationalSongsListState();
 }
 
-class _NationalSongsState extends State<NationalSongs>
+class _NationalSongsListState extends State<NationalSongsList>
 {
-  var data;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isLoading = true;
+  List<NationalSongsModel>? nationalSongsModel;
+  TextEditingController searchController = TextEditingController();
+
+  @override
+  void initState()
+  {
+    super.initState();
+
+    Future.delayed(Duration.zero, ()
+    {
+      fetchNationalSongs();
+    });
+    ToastContext().init(context);
+  }
+
+  void fetchNationalSongs() async
+  {
+    Response response;
+    response = await get(Uri.parse(widget.url));
+    if (response.statusCode == 200)
+    {
+      setState(()
+      {
+        isLoading = false;
+        nationalSongsModel = nationalSongsModelFromJson(response.body);
+      });
+    }
+    else
+    {
+      debugPrint(response.body.toString());
+      debugPrint(response.statusCode.toString());
+      if(!mounted) return;
+      failureFunction(context, super.widget);
+    }
+  }
 
   @override
   Widget build(BuildContext context)
   {
-    return OrientationBuilder(
-        builder: (context, orientation)
-        {
-          return Scaffold(
-              key: _scaffoldKey,
-              appBar: RepublicDrawer().RepublicAppBar(context,widget.titles),
-              body: FutureBuilder(
-                future: getProductList(widget.url),
-                builder: (context, AsyncSnapshot snapshot)
-                {
-                  switch (snapshot.connectionState)
-                  {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                      return new RepublicDrawer().TirangaProgressBar(context, orientation);
-                    default:
-                      if (snapshot.hasError)
-                        return Center(child: Image.asset("assets/images/navratri_07.gif"));
-                      else
-                        return createListView(context, snapshot, orientation);
-                  }
-                },
-              )
-          );
-        }
-    );
+    ToastContext().init(context);
+    return OrientationBuilder(builder: (context, orientation)
+    {
+      return Scaffold(
+        appBar: RepublicDrawer().RepublicAppBar(context,widget.titles),
+        body: isLoading ? RepublicDrawer().TirangaProgressBar(context, orientation) : specialListView(orientation),
+      );
+    });
   }
 
-  List<NationalSongsModel>? categories;
-  Future<List<NationalSongsModel>> getProductList(String page) async
-  {
-    Response response;
-    response = await get(Uri.parse(page));
-    int statusCode = response.statusCode;
-    final body = json.decode(response.body);
-    print(body);
-    if (statusCode == 200)
-    {
-      categories = (body as List).map((i) => NationalSongsModel.fromJson(i)).toList();
-      return categories!;
-    }
-    else
-    {
-      return categories = [];
-    }
-  }
-
-  // ignore: non_constant_identifier_names
-  Widget TirangaCard(int index, NationalSongsModel value, Orientation orientation)
+  Widget tirangaCard(int index, NationalSongsModel value, Orientation orientation)
   {
     return GestureDetector(
-      onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (context) => NationalSongsOutput(value.name!, value.link!, value.english!, value.hindi!))) : showToast(context, "INTERNET CONNECTION UNAVAILABLE"),
+
+      onTap: () async => await check() ? Future.delayed(Duration.zero, () {
+
+        Navigator.push(context, MaterialPageRoute(builder: (context) => NationalSongsOutput(value.name!, value.link!, value.english!, value.hindi!)));
+
+      }) : showToast("INTERNET CONNECTION UNAVAILABLE"),
       child: Padding(
-        padding: const EdgeInsets.all(5.0),
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
         child: Card(
             elevation: 2,
-            color: (index+1)%2==0 ?Constants.GreenColor:Color(0xFFFF33C9),
+            color: (index+1) % 2 == 0 ? Constants.GreenColor : Constants.OrangeColor,
             borderOnForeground: true,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
-            child: Container(
+            child: SizedBox(
               width: MediaQuery.of(context).size.width-20,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children:
                 [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround, children:
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children:
                   [
                     Padding(
                       padding: const EdgeInsets.all(5.0),
@@ -105,12 +108,15 @@ class _NationalSongsState extends State<NationalSongs>
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Container(width: orientation==Orientation.portrait?MediaQuery.of(context).size.width*0.7:MediaQuery.of(context).size.width*0.8,child: Marquee(
+                      child: SizedBox(width: orientation==Orientation.portrait?MediaQuery.of(context).size.width*0.7:MediaQuery.of(context).size.width*0.8,child: Marquee(
                           textDirection : TextDirection.ltr,
-                          animationDuration: Duration(seconds: 3),
+                          animationDuration: const Duration(seconds: 3),
                           directionMarguee: DirectionMarguee.oneDirection,
-                          child: Text(value.name!.toUpperCase(), maxLines: 2, //textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 20,color: (index+1)%2==0?Constants.BlueColor:Colors.white, fontFamily: Constants.AppFont, fontWeight: FontWeight.bold)))),
+                          child: Text(value.name!, maxLines: 2, //textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 16,color: (index+1)%2==0?Constants.BlueColor:Colors.white, fontFamily: Constants.AppFont, fontWeight: FontWeight.bold)
+                          )
+                      )
+                      ),
                     ),
                   ])
                 ],
@@ -121,17 +127,59 @@ class _NationalSongsState extends State<NationalSongs>
     );
   }
 
-  Widget createListView(BuildContext context, AsyncSnapshot snapshot, Orientation orientation)
+  Widget specialListView(Orientation orientation)
   {
-    List<NationalSongsModel> data = snapshot.data;
-    return ListView.builder(
-      key: UniqueKey(),
-      itemCount: data.length,
-      itemBuilder: (context, index)
-      {
-        final value = data[index];
-        return TirangaCard(index, value, orientation);
-      },
+    int index = 0;
+    return Padding(
+      padding: const EdgeInsets.only(top:10, left: 10.0, right:10.0),
+      child: SearchableList<NationalSongsModel>(
+        initialList: nationalSongsModel!,
+        itemBuilder: (NationalSongsModel nationalSongsModel)
+        {
+          index++;
+          return tirangaCard(index, nationalSongsModel, orientation);
+        },
+        filter: (value) => nationalSongsModel!.where((element) => element.name!.toLowerCase().contains(value.toLowerCase())).toList(),
+        searchTextController: searchController,
+        inputDecoration: InputDecoration(
+          suffix: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: CircleAvatar(
+                radius: 15,
+                backgroundColor: Colors.grey[300],
+                child: IconButton(
+                  icon: const Icon(Icons.close, size: 15, color: Color(0xFF333333),),
+                  onPressed: ()
+                  {
+                    searchController.clear();
+                    setState(()
+                    {
+                      nationalSongsModel;
+                    });
+                  },
+                ),
+              )
+          ),
+          hintText: "Search Songs",
+          hintStyle: const TextStyle(fontFamily: 'Poppins', color: Constants.GreenColor, fontSize: 14),
+          labelStyle: const TextStyle(fontFamily: 'Poppins', color: Color(0xFF333333), fontSize: 14),
+          border: const OutlineInputBorder(borderSide: BorderSide(
+              color: Constants.OrangeColor
+          )),
+          focusedBorder: const OutlineInputBorder(borderSide: BorderSide(
+              color: Constants.OrangeColor
+          )),
+          labelText: "Search Songs",
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+                icon: const Icon(Icons.search, size: 25),
+                color: const Color(0xFF333333),
+                onPressed: () {}),
+          ),
+          contentPadding: const EdgeInsets.only(right: 0, left: 10),
+        ),
+      ),
     );
   }
 }

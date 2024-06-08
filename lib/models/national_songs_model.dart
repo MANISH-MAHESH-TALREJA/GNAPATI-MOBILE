@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+List<NationalSongsModel>? nationalSongsModelFromJson(String str) => List<NationalSongsModel>.from(json.decode(str).map((x) => NationalSongsModel.fromJson(x)));
+String nationalSongsModelToJson(List<NationalSongsModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
 class NationalSongsModel
 {
   String? link;
@@ -17,11 +22,11 @@ class NationalSongsModel
 
   Map<String, dynamic> toJson()
   {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['link'] = this.link;
-    data['name'] = this.name;
-    data['hindi'] = this.hindi;
-    data['english'] = this.english;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['link'] = link;
+    data['name'] = name;
+    data['hindi'] = hindi;
+    data['english'] = english;
     return data;
   }
 }

@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'package:audio_player/audioplayer.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:ganpati/general_utility_functions.dart';
+import 'package:toast/toast.dart';
 import '../../constants.dart';
-import '../../audio_player.dart';
+import '../../flutter_html/flutter_html.dart';
 import '../../main_pages/Other/app_bar_drawer.dart';
 
 typedef void OnError(Exception exception);
@@ -56,11 +57,11 @@ class _NationalSongsOutputState extends State<NationalSongsOutput>
     _audioPlayerStateSubscription =
         audioPlayer!.onPlayerStateChanged.listen((s)
         {
-          if (s == AudioPlayerState.PLAYING)
+          if (s == AudioPlayerState.playing)
           {
             setState(() => duration = audioPlayer!.duration);
           }
-          else if (s == AudioPlayerState.STOPPED)
+          else if (s == AudioPlayerState.stopped)
           {
             onComplete();
             setState(()
@@ -91,7 +92,7 @@ class _NationalSongsOutputState extends State<NationalSongsOutput>
     }
     else
     {
-      showToast(context, "INTERNET CONNECTION UNAVAILABLE");
+      showToast("INTERNET CONNECTION UNAVAILABLE");
     }
   }
 
@@ -122,6 +123,7 @@ class _NationalSongsOutputState extends State<NationalSongsOutput>
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return Scaffold(
         appBar: RepublicDrawer().RepublicAppBar(context,Constants.OutputAppBarTitle),
         body: Padding(
@@ -139,10 +141,10 @@ class _NationalSongsOutputState extends State<NationalSongsOutput>
               front: Padding(
                 padding: const EdgeInsets.symmetric(vertical : 5.0),
                 child: Center(child: SingleChildScrollView(child: Html(
-                    /*defaultTextStyle: TextStyle(
+                    defaultTextStyle: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white),*/
+                        color: Colors.white),
                     data: '''  ${"<center>"+widget.hindi+"</center>"}   '''),
                 )),
               ),
@@ -154,10 +156,10 @@ class _NationalSongsOutputState extends State<NationalSongsOutput>
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical : 5.0),
                   child: Center(child: SingleChildScrollView(child: Html(
-                      /*defaultTextStyle: TextStyle(
+                      defaultTextStyle: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
-                          color: Constants.BlueColor),*/
+                          color: Constants.BlueColor),
                       data: '''  ${"<center>"+widget.english+"</center>"}   '''),
                   )),
                 ),

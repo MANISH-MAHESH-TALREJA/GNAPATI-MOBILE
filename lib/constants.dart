@@ -2,23 +2,24 @@ import 'dart:ui';
 
 class Constants
 {
-  static const NationalSymbolsAPI      =   "https://api.npoint.io/17aa2079209db5c0482d";//---
-  static const UnknownFactsAPI         =   "https://api.npoint.io/2f8617b7eeaf9ec71dfd";//---
-  static const NationalSongsAPI        =   "https://api.npoint.io/9268c83b860d93857cd7";//---
-  static const RingtoneAPI             =   "https://api.npoint.io/fe4cd2af25b2651ef3ec";//---
-  static const WallpaperAPI            =   "https://api.npoint.io/54081537802ba4c77bcd";//---
-  static const VideoStatusAPI          =   "https://api.npoint.io/74f5459f1533a76496b7";//---
-  static const NameLettersAPI          =   "https://api.npoint.io/9f5f6f6d2e36c1ace565";//---
-  static const ShayariAPI              =   "https://api.npoint.io/445469455c1e44483113";//---
+  static const NationalSymbolsAPI      =   "https://manishtalreja.com/GANPATI/GANPATI_PUJA.JSON";
+  static const UnknownFactsAPI         =   "https://manishtalreja.com/GANPATI/GANPATI_ASTAVINAYAKA.JSON";
+  static const NationalSongsAPI        =   "https://manishtalreja.com/GANPATI/GANPATI_AARTI.JSON";
+  static const RingtoneAPI             =   "https://manishtalreja.com/GANPATI/GANPATI_RINGTONES.JSON";
+  static const WallpaperAPI            =   "https://manishtalreja.com/GANPATI/GANPATI_WALLPAPERS.JSON";
+  static const VideoStatusAPI          =   "https://manishtalreja.com/GANPATI/GANPATI_STATUS.JSON";
+  static const NameLettersAPI          =   "https://manishtalreja.com/GANPATI/GANPATI_NAME_LETTERS.JSON";
+  static const ShayariAPI              =   "https://manishtalreja.com/GANPATI/GANPATI_MANTRA.JSON";
 
   static const AppName                 =    "GANPATI";
+  static const AppNotificationKey      =    "GANPATI";
   static const AppFont                 =    "Tahoma";
   static const AppIcon                 =    "assets/images/app_icon.png";
-  static const AppVersion              =    "2021-03-26";
+  static const AppVersion              =    "2024-06-08";
   static const AppEmail                =    "MANISHTALREJA189@GMAIL.COM";
   static const AppPackage              =    "net.manish.ganpati";
   static const AppPrivacyPolicyPage    =    "https://sites.google.com/view/ganpati-bappa-morya";
-  static const AppWebsitePage          =    "http://manish.press/";
+  static const AppWebsitePage          =    "http://manishtalreja.com/";
   static const AppDeveloperPage        =    "https://play.google.com/store/apps/developer?id=MANISH+MAHESH+TALREJA";
   static const AppPlayStoreLink        =    "https://play.google.com/store/apps/details?id=net.manish.ganpati";
 
@@ -32,11 +33,11 @@ class Constants
   static const AppBarWallpaper        =    ["WALLPAPERS", "गणपति बप्पा के वालपेपर"];
   static const AppBarRingtone         =    ["RINGTONES", "गणपति बप्पा के रिंगटन"];
 
-  static const BannerNetworkImage_01  =    "https://manish-mahesh-talreja.000webhostapp.com/APPLICATION-DATA/GANPATI/BANNERS/01.jpg";
-  static const BannerNetworkImage_02  =    "https://manish-mahesh-talreja.000webhostapp.com/APPLICATION-DATA/GANPATI/BANNERS/02.jpg";
-  static const BannerNetworkImage_03  =    "https://manish-mahesh-talreja.000webhostapp.com/APPLICATION-DATA/GANPATI/BANNERS/03.jpg";
-  static const BannerNetworkImage_04  =    "https://manish-mahesh-talreja.000webhostapp.com/APPLICATION-DATA/GANPATI/BANNERS/04.jpg";
-  static const BannerNetworkImage_05  =    "https://manish-mahesh-talreja.000webhostapp.com/APPLICATION-DATA/GANPATI/BANNERS/05.jpg";
+  static const BannerNetworkImage_01  =    "https://manishtalreja.com/APPLICATION-DATA/GANPATI/BANNERS/01.jpg";
+  static const BannerNetworkImage_02  =    "https://manishtalreja.com/APPLICATION-DATA/GANPATI/BANNERS/02.jpg";
+  static const BannerNetworkImage_03  =    "https://manishtalreja.com/APPLICATION-DATA/GANPATI/BANNERS/03.jpg";
+  static const BannerNetworkImage_04  =    "https://manishtalreja.com/APPLICATION-DATA/GANPATI/BANNERS/04.jpg";
+  static const BannerNetworkImage_05  =    "https://manishtalreja.com/APPLICATION-DATA/GANPATI/BANNERS/05.jpg";
 
   static const OutputAppBarTitle      =     ["GANPATI BAPPA", "GANESH CHATURTHI", "जय श्री गणेश", "शुभ गणेश चतुर्थी"];
 

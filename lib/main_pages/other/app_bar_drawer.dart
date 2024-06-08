@@ -20,7 +20,7 @@ class RepublicDrawer extends StatelessWidget
                 accountName:  SizedBox(
                   width: MediaQuery.of(context).size.width-25,
                   child: TyperAnimatedTextKit(
-                    onTap: () => showToast(context, "HAPPY GANESH CHATURTHI 2021"),
+                    onTap: () => showToast("HAPPY GANESH CHATURTHI 2024"),
                     speed: Duration(milliseconds: 250),
                     isRepeatingAnimation: true,
                     repeatForever: true,
@@ -40,7 +40,7 @@ class RepublicDrawer extends StatelessWidget
                 accountEmail:  SizedBox(
                   width: MediaQuery.of(context).size.width-25,
                   child: TyperAnimatedTextKit(
-                    onTap: () => showToast(context, "HAPPY GANESH CHATURTHI 2021"),
+                    onTap: () => showToast("HAPPY GANESH CHATURTHI 2024"),
                     speed: Duration(milliseconds: 250),
                     isRepeatingAnimation: true,
                     repeatForever: true,
@@ -232,32 +232,32 @@ class RepublicDrawer extends StatelessWidget
       [
         IconButton
           (
-            icon: Icon(Icons.share, color: Constants.OrangeColor,),
+            icon: const Icon(Icons.share, color: Constants.OrangeColor, size: 25,),
             tooltip: 'SHARE APPLICATION',
-            onPressed: () => shareMe(),
+            onPressed: () => shareMe()
         ),
       ],
       title: Padding(
         padding: const EdgeInsets.only(top:12.0),
         child: ScaleAnimatedTextKit(
-            onTap: () {},
-            text: title,
-            textStyle: TextStyle(
-                fontSize: 19.0,
-                fontFamily: "Tahoma",
-                color: Constants.OrangeColor,
-                fontWeight: FontWeight.bold
-            ),
-            textAlign: TextAlign.start,
-            repeatForever: true,
+          onTap: () {},
+          text: title,
+          textStyle: const TextStyle(
+              fontSize: 19.0,
+              fontFamily: "Poppins",
+              color: Constants.OrangeColor,
+              fontWeight: FontWeight.bold
+          ),
+          textAlign: TextAlign.start,
+          repeatForever: true,
 
         ),
       ),
       centerTitle: true,
       elevation: 0,
-      iconTheme: IconThemeData(
+      iconTheme: const IconThemeData(
           color: Constants.OrangeColor,
-          size: 50
+          size: 25
       ),
       backgroundColor: Colors.transparent,
     );

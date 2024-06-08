@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ganpati/constants.dart';
 import 'package:ganpati/sub_category.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:toast/toast.dart';
 import '../../first_tab_pages/parent_pages/image_files.dart';
 import '../../first_tab_pages/parent_pages/national_symbols.dart';
 import '../../ganesh_puja.dart';
@@ -28,14 +29,41 @@ class _HorizontalMainPageState extends State<HorizontalMainPage>
     InAppUpdate.checkForUpdate();
   }
 
+  bool canPopNow = false;
+  int requiredSeconds = 2;
+  void onPopInvoked(bool didPop) {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime!) >
+            Duration(seconds: requiredSeconds)) {
+      currentBackPressTime = now;
+      showToast("PRESS BACK BUTTON AGAIN TO EXIT");
+      Future.delayed(
+        Duration(seconds: requiredSeconds),
+            () {
+          // Disable pop invoke and close the toast after 2s timeout
+          setState(() {
+            canPopNow = false;
+          });
+        },
+      );
+      // Ok, let user exit app on the next back press
+      setState(() {
+        canPopNow = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context)
   {
+    ToastContext().init(context);
     return Scaffold(
       appBar: RepublicDrawer().RepublicAppBar(context, Constants.OutputAppBarTitle),
       drawer: RepublicDrawer(),
-      body: WillPopScope(
-        onWillPop: onWillPop,
+      body: PopScope(
+        canPop: canPopNow,
+        onPopInvoked: onPopInvoked,
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -147,7 +175,7 @@ class _HorizontalMainPageState extends State<HorizontalMainPage>
     if (currentBackPressTime == null || now.difference(currentBackPressTime!) > Duration(seconds: 2))
     {
       currentBackPressTime = now;
-      showToast(context,"PRESS BACK BUTTON AGAIN TO EXIT");
+      showToast("PRESS BACK BUTTON AGAIN TO EXIT");
       return Future.value(false);
     }
     return Future.value(true);
@@ -157,7 +185,7 @@ class _HorizontalMainPageState extends State<HorizontalMainPage>
   Widget FirstHorizontalCard(BuildContext context, String image, String title, Widget nextPage)
   {
     return GestureDetector(
-      onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (context) => nextPage)) : showToast(context, "KINDLY CHECK YOUR INTERNET CONNECTION"),
+      onTap: () async => await check() ? Navigator.push(context, MaterialPageRoute(builder: (context) => nextPage)) : showToast("KINDLY CHECK YOUR INTERNET CONNECTION"),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
