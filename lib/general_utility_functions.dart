@@ -476,7 +476,8 @@ void setRingtone(BuildContext context, String url, int type) async
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     if(androidInfo.version.sdkInt >= 33.0)
     {
-      PermissionStatus permissionStatus01 = await Permission.audio.status;
+      showToast("THIS FUNCTIONALITY WILL BE BE AVAILABLE IN FUTURE UPDATES ...");
+      /*PermissionStatus permissionStatus01 = await Permission.audio.status;
       PermissionStatus permissionStatus02 = await Permission.videos.status;
       PermissionStatus permissionStatus03 = await Permission.photos.status;
       PermissionStatus permissionStatus04 = await Permission.notification.status;
@@ -532,7 +533,7 @@ void setRingtone(BuildContext context, String url, int type) async
                 }, width: 120, child: const Text("CANCEL", style: TextStyle(color: Colors.white, fontSize: 20)))
               ]).show();
         }
-      }
+      }*/
     }
     else
     {
