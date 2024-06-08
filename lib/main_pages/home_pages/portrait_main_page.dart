@@ -117,6 +117,7 @@ class _PortraitMainPageState extends State<PortraitMainPage>
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
+              SizedBox(height: 30,),
               AvatarGlow(
                   glowCount: 2,
                   glowRadiusFactor: 0.4,
