@@ -3,11 +3,17 @@ version '1.0'
 
 buildscript {
     ext {
-        agp_version = '8.4.1'
+        agp_version = '8.13.0'
     }
     repositories {
         google()
-        jcenter()
+        //jcenter()
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/spring' }
+        maven { url 'https://maven.aliyun.com/repository/releases' }
     }
 
     dependencies {
@@ -18,14 +24,20 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
+        //jcenter()
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/spring' }
+        maven { url 'https://maven.aliyun.com/repository/releases' }
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdk 34
+    compileSdk 36
     namespace "net.manish.audio"
 
     defaultConfig {
